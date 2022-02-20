@@ -11,6 +11,7 @@ FORMAT = '%(asctime)s %(message)s'
 logging.basicConfig(format=FORMAT)
 logger = logging.getLogger("obfuscatorLogger")
 logger.setLevel(5)
+# //TODO: add doc for this whole thing
 
 
 class Obfuscate:

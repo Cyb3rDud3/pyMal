@@ -4,14 +4,15 @@ import os
 import random
 import base64
 from Utils.helpers import is_os_64bit,run_pwsh,is_msvc_exist,download_file,extract_zip
-import requests
-from zipfile import ZipFile
 from .pyinstaller_obfuscate.obfuscationModule.main import Obfuscate
 from .pyinstaller_obfuscate.main import obfuscate_files
 
 
 
-def download_pyinstaller(download_path):
+def download_pyinstaller(download_path : str):
+    """
+    :param download_path: the assumed file name on the local system when downloaded
+    """
     URL = "https://github.com/pyinstaller/pyinstaller/archive/refs/tags/v4.7.zip"
     clean_path = download_path.replace('.zip','')
     if os.path.exists(download_path):
@@ -26,7 +27,11 @@ def download_pyinstaller(download_path):
 
 
 
-def get_pyinstaller(pythonPath,admin=True):
+def get_pyinstaller(pythonPath:str,admin=True):
+    """
+    :param str pythonPath: abs path to python.exe
+    :param bool admin: specify if we got admin permissions.
+    """
     PATH = f"c:/users/{os.getlogin()}/appdata/local/temp/pyinstaller-4.7.zip"
     if not download_pyinstaller(PATH):
         # assume pyinstaller extracted in the PATH
@@ -59,6 +64,7 @@ def get_pyinstaller(pythonPath,admin=True):
     pass
 def pip_install(new_path=None):
     # base64 encode&decode all commands here on runtime, to prevent obfuscation from obfuscating the packages to install
+    #//TODO: add doc
     to_install = "Y3J5cHRvZ3JhcGh5IHRpbnlhZXMgbmV0aWZhY2VzIHJlcXVlc3RzIHBzdXRpbCBwYXRobGliMiB3aGVlbA=="
     if new_path:
         subprocess.run(
@@ -74,6 +80,7 @@ def pip_install(new_path=None):
 
 
 def install_python():
+    #//TODO: add doc
     os_p = 64
     if not is_os_64bit():
         os_p = 32

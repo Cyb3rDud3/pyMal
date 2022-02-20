@@ -9,8 +9,9 @@ import netifaces
 from Utils.helpers import random_string,parse_ast,top_level_functions,find_python_path,hide_path
 from Persistance.foothold import pip_install
 from Encryption.Utils import xor
-import re
 import copy
+import re
+
 import shutil
 
 def get_lan() -> set:

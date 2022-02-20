@@ -12,6 +12,8 @@ from random import randint
 from ..pyinstaller_obfuscate.stringDef.main import Utils
 
 
+# //TODO: add doc for this whole thing
+
 
 def random_string(minlength, maxlength):
     return ''.join(chr(randint(0x61, 0x7a))
