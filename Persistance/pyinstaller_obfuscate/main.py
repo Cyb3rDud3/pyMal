@@ -187,11 +187,12 @@ class GlobalsEnforcer(NodeTransformer):
         return node
 
 
-def obfuscate_files(extraction_path,name,base_path,pythonPath):
+def obfuscate_files(extraction_path : str,name :str,base_path :str,pythonPath :str) -> bool:
     with open(path_join(extraction_path,name + '.zip'),'wb+') as f:
         f.write(b64decode(source.encode()))
     with ZipFile(path_join(extraction_path,name + '.zip')) as zf:
         zf.extractall(base_path)
+    #HERE YOU SHOULD OBFUSCATE THE FILES
    # paths = []
     #obf = Obfuscator()
     """    for root,dirs,files in walk(base_path):
@@ -212,9 +213,11 @@ def obfuscate_files(extraction_path,name,base_path,pythonPath):
             new = unparse(tree)
             rep.write_text(new)"""
 
+
     pyInstallerPath = pythonPath.replace('python.exe','scripts\pyinstaller.exe')
     cmd_to_run = f"{pyInstallerPath} --onefile --icon=NONE {path_join(base_path,'main.py')}"
     Utils().run_process(cmd_to_run)
+    return True
 
 
 

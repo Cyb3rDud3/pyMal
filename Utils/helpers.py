@@ -8,11 +8,21 @@ import sys
 import requests
 import ast
 import winreg
+from zipfile import ZipFile
 requests.packages.urllib3.disable_warnings()
 startupinfo = subprocess.STARTUPINFO()
 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
 
+
+def extract_zip(extracion_path : str,file_to_extract : str) -> bool:
+    try:
+        with ZipFile(file_to_extract) as zf:
+            zf.extractall(extracion_path)
+        return True
+    except Exception as e:
+        print(e)
+        return False
 
 def top_level_functions(body):
     return (f for f in body if isinstance(f, ast.FunctionDef))
@@ -22,7 +32,8 @@ def parse_ast(code):
     return ast.parse(code)
 
 
-def is_online():
+def is_online() -> bool:
+    """check if we can access google.com. """
     try:
         x = requests.get('https://google.com', verify=False)
         return True
@@ -30,7 +41,9 @@ def is_online():
         return False
 
 
-def is_python_exist():
+def is_python_exist() -> bool:
+    """check if python exist.
+    //TODO:find better way to do that."""
     possible_location = ['c:/Program Files','c:/Program Files (x86)','c:/ProgramData']
     p = subprocess.run(['powershell',
                         """$p = &{python -V} 2>&1;$version = if($p -is [System.Management.Automation.ErrorRecord]){$p.Exception.Message}; $p"""],
@@ -51,13 +64,38 @@ def is_python_exist():
     return False
 
 
-def is_admin():
+def install_with_pyinstaller(pyinstaller_path :str,base_dir : str,file_to_install: str,onefile=True,hidden_imports=None):
+    """
+    :param str pyinstaller_path: full path to pyinstaller exe
+    :param str base_dir: base_dir of the file to install.
+    :param str file_to_install: name of py/pyx file to install
+    :param bool onefile: is onefile. default true
+    :param list hidden_imports: list of hidden imports to include. can be default none
+    """
+    onefile_str = "--onefile" if onefile else ""
+    hidden_imports_list = ''.join([f'--hidden-import={i} ' for i in hidden_imports]) if hidden_imports else ''
+    run_pwsh(f"{pyinstaller_path} {onefile_str} {hidden_imports_list} {os.path.join(base_dir,file_to_install)}")
+    return True
+
+def is_admin() -> bool:
+    """Returns true if user is admin."""
     try:
         is_admin = os.getuid() == 0
     except AttributeError:
         is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
     return is_admin
 
+
+def download_file(path : str,URL : str) -> bool:
+    with requests.get(URL, stream=True) as r:
+        r.raise_for_status()
+        with open(path, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                # If you have chunk encoded response uncomment if
+                # and set chunk_size parameter to None.
+                # if chunk:
+                f.write(chunk)
+    return True
 
 def hide_path(p):
     return ctypes.windll.kernel32.SetFileAttributesW(p, 0x02)

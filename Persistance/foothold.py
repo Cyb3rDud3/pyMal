@@ -3,28 +3,34 @@ import subprocess
 import os
 import random
 import base64
-from Utils.helpers import is_os_64bit,run_pwsh,is_msvc_exist
+from Utils.helpers import is_os_64bit,run_pwsh,is_msvc_exist,download_file,extract_zip
 import requests
 from zipfile import ZipFile
 from .pyinstaller_obfuscate.obfuscationModule.main import Obfuscate
 from .pyinstaller_obfuscate.main import obfuscate_files
-def get_pyinstaller(pythonPath,admin=True):
+
+
+
+def download_pyinstaller(download_path):
     URL = "https://github.com/pyinstaller/pyinstaller/archive/refs/tags/v4.7.zip"
+    clean_path = download_path.replace('.zip','')
+    if os.path.exists(download_path):
+        os.remove(download_path)
+    if os.path.exists(clean_path):
+        shutil.rmtree(clean_path)
+    if download_file(clean_path,URL):
+        if extract_zip(f"c:/users/{os.getlogin()}/appdata/local/temp",clean_path):
+            return f"c:/users/{os.getlogin()}/appdata/local/temp/pyinstaller-4.7"
+    return False
+
+
+
+
+def get_pyinstaller(pythonPath,admin=True):
     PATH = f"c:/users/{os.getlogin()}/appdata/local/temp/pyinstaller-4.7.zip"
-    if os.path.exists(PATH):
-        os.remove(PATH)
-    if os.path.exists(PATH.replace('.zip','')):
-        shutil.rmtree(PATH.replace('.zip',''))
-    with requests.get(URL, stream=True) as r:
-        r.raise_for_status()
-        with open(PATH, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                # If you have chunk encoded response uncomment if
-                # and set chunk_size parameter to None.
-                # if chunk:
-                f.write(chunk)
-    with ZipFile(PATH) as zf:
-        zf.extractall(f"c:/users/{os.getlogin()}/appdata/local/temp/")
+    if not download_pyinstaller(PATH):
+        # assume pyinstaller extracted in the PATH
+        print("[*] Unknown error in extracting and downloading pyinstaller")
     if admin:
         if is_msvc_exist():
             if Obfuscate(base_dir=f"c:/users/{os.getlogin()}/appdata/local/temp/",python_path=pythonPath).obfuscate():
@@ -32,28 +38,25 @@ def get_pyinstaller(pythonPath,admin=True):
         else:
             gcc = "https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-9.0.0-msvcrt-r6/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64-9.0.0-r6.zip"
             PATH = f"c:/users/{os.getlogin()}/appdata/local/temp/gcc.zip"
+            GCC_EXTRACTION_PATH = "c:/MinGW"
             if os.path.exists(PATH):
                os.remove(PATH)
-            if os.path.exists("c:/MinGW"):
-                shutil.rmtree("c:/MinGW")
-            with requests.get(gcc, stream=True) as r:
-                r.raise_for_status()
-                with open(PATH, 'wb') as f:
-                    for chunk in r.iter_content(chunk_size=8192):
-                        # If you have chunk encoded response uncomment if
-                        # and set chunk_size parameter to None.
-                        # if chunk:
-                        f.write(chunk)
-            with ZipFile(PATH) as zf:
-                zf.extractall(f"c:/MinGW")
+            if os.path.exists(GCC_EXTRACTION_PATH):
+                shutil.rmtree(GCC_EXTRACTION_PATH)
+            if download_file(path=PATH,URL=gcc):
+                extract_zip(extracion_path=GCC_EXTRACTION_PATH,file_to_extract=PATH)
             os.system(r'setx PATH "C:\MinGW\mingw64\bin;%PATH%"')
             if Obfuscate(base_dir=f"c:/users/{os.getlogin()}/appdata/local/temp/",python_path=pythonPath).obfuscate():
                 obfuscate_files(extraction_path=f"c:/users/{os.getlogin()}/appdata/local/temp/",name="test",base_path=f"c:/users/{os.getlogin()}/appdata/local/temp/try_this",pythonPath=pythonPath)
             #get gcc?
             pass
-    #get runw.
-    pass
+    #no admin
+    if is_msvc_exist():
+        #assume your are not admin, but pyinstaller exist and you have msvc
+        #TODO:// detect other C COMPILERS
+        return
 
+    pass
 def pip_install(new_path=None):
     # base64 encode&decode all commands here on runtime, to prevent obfuscation from obfuscating the packages to install
     to_install = "Y3J5cHRvZ3JhcGh5IHRpbnlhZXMgbmV0aWZhY2VzIHJlcXVlc3RzIHBzdXRpbCBwYXRobGliMiB3aGVlbA=="
