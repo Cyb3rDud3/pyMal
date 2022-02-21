@@ -110,7 +110,10 @@ def download_file(path : str,URL : str) -> bool:
                 f.write(chunk)
     return True
 
-def hide_path(p):
+def hide_path(p : str):
+    """
+    :param p: path that we want to make "hidden" using windows api.
+    """
     return ctypes.windll.kernel32.SetFileAttributesW(p, 0x02)
 
 
@@ -124,6 +127,8 @@ def random_string(length : int):
 def run_pwsh(code : str):
     """
     :param code: powershell code to run
+
+    //TODO: add creation flags to make hidden, but still get stdout.
     """
     p = subprocess.run(['powershell', code], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     return p.stdout.decode()
