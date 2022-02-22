@@ -8,6 +8,7 @@ import sys
 import requests
 import ast
 import winreg
+from base64 import b64encode
 from zipfile import ZipFile
 requests.packages.urllib3.disable_warnings()
 startupinfo = subprocess.STARTUPINFO()
@@ -29,12 +30,12 @@ def extract_zip(extracion_path : str,file_to_extract : str) -> bool:
         return False
 
 def top_level_functions(body):
-    #//TODO: add doc
+    #//TODO 11: add doc
     return (f for f in body if isinstance(f, ast.FunctionDef))
 
 
 def parse_ast(code):
-    #//TODO: add doc
+    #//TODO 12: add doc
     return ast.parse(code)
 
 
@@ -49,7 +50,7 @@ def is_online() -> bool:
 
 def is_python_exist() -> bool:
     """check if python exist.
-    //TODO:find better way to do that."""
+    //TODO 13:find better way to do that."""
     possible_location = ['c:/Program Files','c:/Program Files (x86)','c:/ProgramData']
     p = subprocess.run(['powershell',
                         """$p = &{python -V} 2>&1;$version = if($p -is [System.Management.Automation.ErrorRecord]){$p.Exception.Message}; $p"""],
@@ -78,8 +79,8 @@ def install_with_pyinstaller(pyinstaller_path :str,base_dir : str,file_to_instal
     :param bool onefile: is onefile. default true
     :param list hidden_imports: list of hidden imports to include. can be default none
 
-    //TODO: THIS IS NOT UNDERSTANDABLE FUNCTION! FIX IT
-    //TODO: we use here run_pwsh, but we might dont want powershell. but a hidden subprocess.
+    //TODO 14: THIS IS NOT UNDERSTANDABLE FUNCTION! FIX IT
+    //TODO 15: we use here run_pwsh, but we might dont want powershell. but a hidden subprocess.
     """
     onefile_str = "--onefile" if onefile else ""
     hidden_imports_list = ''.join([f'--hidden-import={i} ' for i in hidden_imports]) if hidden_imports else ''
@@ -128,7 +129,7 @@ def run_pwsh(code : str):
     """
     :param code: powershell code to run
 
-    //TODO: add creation flags to make hidden, but still get stdout.
+    //TODO 16: add creation flags to make hidden, but still get stdout.
     """
     p = subprocess.run(['powershell', code], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     return p.stdout.decode()
@@ -143,7 +144,7 @@ def is_os_64bit() -> bool:
 
 def find_python_path() -> str:
     """
-    //TODO: Fix/make this function understandable!
+    //TODO 17: Fix/make this function understandable!
     """
     from Persistance.foothold import pip_install
     base_path = f"c:/users/{os.getlogin()}/appdata/local/programs/python"
@@ -169,11 +170,33 @@ def find_python_path() -> str:
         sys.exit()
 
 
+def base64_encode_file(file_path : str) -> str:
+    """
+    we are gonna read the file in rb mode, encode in base64, and return the base64.
+    :param file_path: full path to file to encode in base64.
+    """
+    with open(file_path,'rb') as file:
+        base64_info = b64encode(file.read())
+        return base64_info.decode()
+
+def get_current_file_path() -> str:
+    """
+    this function return the full current path to the exe running.s
+    """
+    if getattr(sys, 'frozen', False):
+        # If the application is run as a bundle, the PyInstaller bootloader
+        # extends the sys module by a flag frozen=True and sets the app
+        # path into variable _MEIPASS'.
+        application_path = sys.executable
+    else:
+        application_path = os.path.dirname(os.path.abspath(__file__))
+    return application_path
+
 def is_msvc_exist() -> bool:
         """
         this function check in the registry if we have visual studio installed.
         we return True if we find something. false if else.
-        //TODO: find better ways to do this
+        //TODO 18: find better ways to do this
         """
         try:
             winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,"SOFTWARE\Wow6432Node\Microsoft\VisualStudio",0)
