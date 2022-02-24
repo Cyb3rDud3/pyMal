@@ -13,7 +13,8 @@ def evade_debug():
                 time.sleep(99)
 
 
-def detect_vm():
+def detect_vm() -> bool:
+    #false --> not vm, true --> vm
     """Stupid but working.
     //TODO: we have lot's of things to check before running this tests.
     this test is noisy and we should avoid it as much as we can."""
@@ -26,10 +27,10 @@ def detect_vm():
     an = "Get-WmiObject Win32_PortConnector"
     q = run_pwsh(an)
     if 'tag' in q.lower():
-        sys.exit()
+        return True
     for k, v in commands.items():
         j = run_pwsh(k)
         for output in v:
             if output in j:
-                return sys.exit()
+                return True
     return False

