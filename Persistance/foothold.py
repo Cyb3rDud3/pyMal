@@ -92,12 +92,17 @@ def get_pyinstaller(pythonPath: str, admin=True, failed_obfuscate=None):
     """
     PATH = f"c:/users/{os.getlogin()}/appdata/local/temp/pyinstaller-4.7.zip"
     pyinstaller_dir = PATH.replace('.zip', '')
+
     if failed_obfuscate:
         if os.path.exists(pyinstaller_dir):
-            time.sleep(3)  # we wait to make sure we have no handle of the obfuscation active
-            shutil.rmtree(pyinstaller_dir)
-        extract_zip(pyinstaller_dir, PATH)
-        os.system(f"{pythonPath} {pyinstaller_dir}/setup.py install")
+            time.sleep(5)  # we wait to make sure we have no handle of the obfuscation active
+            try:
+                shutil.rmtree(pyinstaller_dir)
+            except Exception as e:
+                pass
+        randPyinstaller = random_string(5)
+        extract_zip(pyinstaller_dir+randPyinstaller, PATH)
+        os.system(f"{pythonPath} {pyinstaller_dir+randPyinstaller}/setup.py install")
         # we install python WITHOUT obfuscatio
         return
     if os.path.exists(PATH):
