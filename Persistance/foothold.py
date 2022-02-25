@@ -102,7 +102,10 @@ def get_pyinstaller(pythonPath: str, admin=True, failed_obfuscate=None):
                 pass
         randPyinstaller = random_string(5)
         extract_zip(pyinstaller_dir+randPyinstaller, PATH)
-        os.system(f"{pythonPath} {pyinstaller_dir+randPyinstaller}/setup.py install")
+        extraction_location = pyinstaller_dir+randPyinstaller+\
+                              '/'+pyinstaller_dir.split('/')[::-1][0].replace('.zip','')
+        os.chdir(extraction_location)
+        os.system(f"{pythonPath} setup.py install")
         # we install python WITHOUT obfuscatio
         return
     if os.path.exists(PATH):

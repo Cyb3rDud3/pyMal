@@ -172,7 +172,7 @@ def base64_encode_file(file_path : str) -> str:
 
 def get_current_file_path() -> str:
     """
-    this function return the full current path to the exe running.s
+    this function return the full current path to the exe running.
     """
     if getattr(sys, 'frozen', False):
         # If the application is run as a bundle, the PyInstaller bootloader
