@@ -150,7 +150,7 @@ class Obfuscate:
     def recompile_bootloader(self):
         # TODO: find python path
         os.chdir(self.bootloader_dir)
-        tryCompile = self.utils.run_process(f"{self.python_path} waf distclean all")
+        tryCompile = self.utils.run_process(rf"{self.python_path} waf distclean all")
         logger.info(tryCompile)
         if type(tryCompile) == list or len(tryCompile) < 2:
             logger.error(f"ERROR COMPILING BOOTLOADER {tryCompile} ")
@@ -161,7 +161,7 @@ class Obfuscate:
     def reinstall_pyinstaller(self):
         if not self.recompile_bootloader():
             logger.error("you got error in compiling the bootloader. exiting")
-            sys.exit()
+            return False
         os.chdir(self.base_dir)
         tryUninstallExisting = self.utils.run_process(f"{self.python_path} -m pip uninstall pyinstaller --yes")
         tryInstall = self.utils.run_process(f"{self.python_path} setup.py install")
