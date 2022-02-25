@@ -46,14 +46,15 @@ class Utils:
     def run_process(self, cmd):
         pkwargs = {
             'close_fds': True,  # close stdin/stdout/stderr on child
-            'creationflags': 0x00000008 | 0x00000200 | 0x08000000,
+            'creationflags': 0x00000008 | 0x00000200 ,
         }
         si = subprocess.STARTUPINFO()
         si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        p = subprocess.run(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE,shell=True,startupinfo=si,**pkwargs)
-        if p.stderr:
-            return [p.stderr]
-        return p.stdout
+        p = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE,**pkwargs)
+        stdout,stderr = p.communicate()
+        if stderr:
+            return [stderr]
+        return stdout
 
     @property
     def original_pyinstaller_str(self) -> str:

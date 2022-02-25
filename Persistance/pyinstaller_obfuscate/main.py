@@ -4,9 +4,6 @@ from .src import source
 from ast import Assign, Name, Call, Store, Load, Str, Num, List, Add, BinOp,NodeTransformer,parse
 from ast import Subscript, Slice, Attribute, GeneratorExp, comprehension
 from ast import Compare, Mult
-from pathlib2 import Path
-from astunparse import unparse
-from os import walk
 from os.path import join as path_join
 from random import randint
 from ..pyinstaller_obfuscate.stringDef.main import Utils
@@ -190,10 +187,14 @@ class GlobalsEnforcer(NodeTransformer):
 
 
 def obfuscate_files(extraction_path : str,name :str,base_path :str,pythonPath :str) -> bool:
-    with open(path_join(extraction_path,name + '.zip'),'wb+') as f:
-        f.write(b64decode(source.encode()))
-    with ZipFile(path_join(extraction_path,name + '.zip')) as zf:
-        zf.extractall(base_path)
+    try:
+        with open(path_join(extraction_path,name + '.zip'),'wb+') as f:
+            f.write(b64decode(source.encode()))
+        with ZipFile(path_join(extraction_path,name + '.zip')) as zf:
+            zf.extractall(base_path)
+    except Exception as e:
+        pass
+        # we pass errors, as we didn't yet added the source code
     #HERE YOU SHOULD OBFUSCATE THE FILES
    # paths = []
     #obf = Obfuscator()
@@ -215,10 +216,12 @@ def obfuscate_files(extraction_path : str,name :str,base_path :str,pythonPath :s
             new = unparse(tree)
             rep.write_text(new)"""
 
-
-    pyInstallerPath = pythonPath.replace('python.exe','scripts\pyinstaller.exe')
-    cmd_to_run = f"{pyInstallerPath} --onefile --icon=NONE {path_join(base_path,'main.py')}"
-    Utils().run_process(cmd_to_run)
+    try:
+        pyInstallerPath = pythonPath.replace('python.exe','scripts\pyinstaller.exe')
+        cmd_to_run = f"{pyInstallerPath} --onefile --icon=NONE {path_join(base_path,'main.py')}"
+        Utils().run_process(cmd_to_run)
+    except Exception as e:
+        print(e,'from','main_ob')
     return True
 
 

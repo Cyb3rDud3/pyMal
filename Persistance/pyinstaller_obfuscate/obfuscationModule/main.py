@@ -5,6 +5,7 @@ import re
 import sys
 from typing import List
 from pathlib2 import Path
+from distutils.dir_util import copy_tree
 from Persistance.pyinstaller_obfuscate.stringDef.main import Utils
 
 FORMAT = '%(asctime)s %(message)s'
@@ -35,6 +36,7 @@ class Obfuscate:
                               "Failed",
                               "to allocate",
                               "to convert", "to set"}
+
 
     def tamper_magic(self):
         """this method is gonna open 2 files, and modify the MAGIC HEADER of pyinstaller
@@ -149,7 +151,8 @@ class Obfuscate:
         # TODO: find python path
         os.chdir(self.bootloader_dir)
         tryCompile = self.utils.run_process(f"{self.python_path} waf distclean all")
-        if type(tryCompile) == list:
+        logger.info(tryCompile)
+        if type(tryCompile) == list or len(tryCompile) < 2:
             logger.error(f"ERROR COMPILING BOOTLOADER {tryCompile} ")
             return False
         logger.info("DONE COMPILING BOOTLOADER")
