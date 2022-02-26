@@ -181,8 +181,6 @@ def get_keyboard_language():
     active window process.
     """
 
-
-
     user32 = WinDLL('user32', use_last_error=True)
 
     # Get the current active window handle

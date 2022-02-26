@@ -5,7 +5,6 @@ import re
 import sys
 from typing import List
 from pathlib2 import Path
-from distutils.dir_util import copy_tree
 from Persistance.pyinstaller_obfuscate.stringDef.main import Utils
 
 FORMAT = '%(asctime)s %(message)s'
@@ -150,6 +149,8 @@ class Obfuscate:
     def recompile_bootloader(self):
         # TODO: find python path
         os.chdir(self.bootloader_dir)
+        print(os.getcwd(),self.python_path)
+        makeSureWeHaveWheel = self.utils.run_process(rf"{self.python_path} -m pip install wheel")
         tryCompile = self.utils.run_process(rf"{self.python_path} waf distclean all")
         logger.info(tryCompile)
         if type(tryCompile) == list or len(tryCompile) < 2:
@@ -269,7 +270,7 @@ class Obfuscate:
         "//TODO: Find a way to validate base_dir && replace the base_Dir"
         for directory in os.listdir(self.base_dir):
                 if 'pyinstaller-' in directory.lower() and not directory.endswith('.zip'):
-                    if directory not in self.base_dir:
+                    if 'setup.py' in os.listdir(os.path.join(self.base_dir,directory)):
                         self.base_dir = os.path.join(self.base_dir, directory)
                     os.chdir(self.base_dir)
                     self.pyinstaller_dir = os.path.join(self.base_dir, "PyInstaller")

