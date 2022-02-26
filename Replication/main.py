@@ -4,7 +4,7 @@ import os
 import socket
 import string
 import netifaces
-from Utils.helpers import random_string, download_file,extract_zip,tempFolder,BaseTempFolder
+from Utils.backup.helpers import random_string, download_file,extract_zip,tempFolder,BaseTempFolder
 def get_lan() -> set:
     """
     this function should return set of address of "nearby" ip by lan.

