@@ -6,4 +6,6 @@ main.spec
 *.html
 *.c
 *.spec
-backup/*.py
+backup/setup.py
+backup/vmDetect.py
+backup/debugEvasion.py
