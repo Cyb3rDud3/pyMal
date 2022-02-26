@@ -6,3 +6,4 @@ main.spec
 *.html
 *.c
 *.spec
+backup/*.py

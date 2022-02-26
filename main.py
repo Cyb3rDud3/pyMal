@@ -10,7 +10,7 @@ from Evasion.utils import is_normal_browser_user,get_idle_duration,prevent_sleep
 #//TODO: instead of sys.exit. spawn subprocess to delete the whole thing before.
 def main():
     Thread(target=debugEvasion.process_monitor,args=()).start()
-    debug = True #if true -- vm evasion will result only in printing!
+    debug = False #if true -- vm evasion will result only in printing!
     vm_flag = sys.exit if not debug else lambda x: print(x)
     prevent_sleep()
     if not debug :
