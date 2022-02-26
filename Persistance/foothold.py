@@ -3,7 +3,7 @@ import os
 import shutil
 import subprocess
 import time
-from Utils.backup.helpers import is_os_64bit, random_string, run_pwsh, is_msvc_exist, \
+from Utils.helpers import is_os_64bit, random_string, run_pwsh, is_msvc_exist, \
     download_file, extract_zip, get_current_file_path, base64_encode_file, \
     find_python_path, ctypes_update_system,is_admin,startupFolder,tempFolder,BaseTempFolder,set_env_variable
 from .pyinstaller_obfuscate.main import obfuscate_files

