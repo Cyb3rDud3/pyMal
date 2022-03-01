@@ -106,8 +106,10 @@ def default_pyinstaller_way(pyInstallerDir : str, pyInstallerZip : str,path_to_p
     extraction_location = pyInstallerDir + randPyinstaller + \
                           '/' + pyInstallerDir.split('/')[::-1][0].replace('.zip', '')
     os.chdir(extraction_location)
-    os.system(f"{path_to_python} setup.py install")
-    return True
+    command = os.system(f"{path_to_python} setup.py install")
+    if command == 0:
+        return True
+    return False
 
 
 def download_gcc(path_to_python : str) -> bool:
