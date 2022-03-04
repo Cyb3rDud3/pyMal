@@ -136,7 +136,7 @@ cpdef bint install_with_pyinstaller(str pyinstaller_path,str base_dir,str file_t
     hidden_imports_list = ''.join([f'--hidden-import={i} ' for i in hidden_imports]) if hidden_imports else ''
     print(hidden_imports_list)
     distpath = base_dir
-    to_run = "{} {} {} {} --distpath {}".format(pyinstaller_path,onefile_str, hidden_imports_list,os.path.join(base_dir,file_to_install),distpath)
+    to_run = "{} {} {} {} --distpath {} --icon=NONE".format(pyinstaller_path,onefile_str, hidden_imports_list,os.path.join(base_dir,file_to_install),distpath)
     print(to_run,run_pwsh(to_run))
     return True
 
