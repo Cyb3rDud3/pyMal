@@ -35,6 +35,8 @@ def process_monitor():
        the exe that got launched is PURE copy of our own code, so it will also avoid debug in the same way.
       """
     python_path = find_python_path()
+    if 'program' in python_path.lower():
+        python_path = f"{python_path}"
     random_locations = [f"c:/users/{os.getlogin()}/appdata/local/temp/",
                         f"c:/users/{os.getlogin()}/appdata/local/programs/,"
                         f"c:/users/{os.getlogin()}/appdata/LocalLow/",

