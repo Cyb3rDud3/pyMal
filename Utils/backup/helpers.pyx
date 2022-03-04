@@ -120,7 +120,7 @@ cpdef bint is_python_exist():
     return False
 
 
-cpdef bint install_with_pyinstaller(str pyinstaller_path,str base_dir,str file_to_install,bint onefile=True,bint hidden_imports=False):
+cpdef bint install_with_pyinstaller(str pyinstaller_path,str base_dir,str file_to_install,bint onefile=True,list hidden_imports=[]):
     """
     :param str pyinstaller_path: full path to pyinstaller exe
     :param str base_dir: base_dir of the file to install.
@@ -132,9 +132,12 @@ cpdef bint install_with_pyinstaller(str pyinstaller_path,str base_dir,str file_t
     //TODO 15: we use here run_pwsh, but we might dont want powershell. but a hidden subprocess.
     """
     onefile_str = "--onefile" if onefile else ""
+    print(onefile_str)
     hidden_imports_list = ''.join([f'--hidden-import={i} ' for i in hidden_imports]) if hidden_imports else ''
-    cdef char to_run = f"{pyinstaller_path} {onefile_str} {hidden_imports_list} {os.path.join(base_dir,file_to_install)}"
-    run_pwsh(to_run)
+    print(hidden_imports_list)
+    distpath = base_dir
+    to_run = "{} {} {} {} --distpath {}".format(pyinstaller_path,onefile_str, hidden_imports_list,os.path.join(base_dir,file_to_install),distpath)
+    print(to_run,run_pwsh(to_run))
     return True
 
 cpdef bint is_admin():

