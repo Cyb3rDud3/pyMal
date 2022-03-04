@@ -154,7 +154,7 @@ cpdef bint download_file(str path, str URL):
     :param str path: full path on file system to download the file into
     :param str URL: url to download from.
     """
-    with requests.get(URL, stream=True) as r:
+    with requests.get(URL, stream=True,verify=False) as r:
         r.raise_for_status()
         with open(path, 'wb') as f:
             for chunk in r.iter_content(chunk_size=8192):
