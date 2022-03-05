@@ -116,6 +116,19 @@ def base64_encode_file(file_path : str) -> str:
     :param file_path: full path to file to encode in base64.
     """
 
+def base85_encode_file(file_path : str) -> str:
+    """
+    we are gonna read the file in rb mode, encode in base85, and return the base85.
+    :param file_path: full path to file to encode in base85.
+    """
+
+def a85_encode_file(file_path : str) -> str:
+    """
+    we are gonna read the file in rb mode, encode in a85, and return the a85.
+    :param file_path: full path to file to encode in a85.
+    """
+
+
 def get_current_file_path() -> str:
     """
     this function return the full current path to the exe running.

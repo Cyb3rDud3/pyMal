@@ -8,7 +8,7 @@ import subprocess
 import sys
 import requests
 import winreg
-from base64 import b64encode
+from base64 import b64encode,b85encode,a85encode
 from zipfile import ZipFile
 requests.packages.urllib3.disable_warnings()
 startupinfo = subprocess.STARTUPINFO()
@@ -255,6 +255,25 @@ cpdef str base64_encode_file(str file_path):
     with open(file_path,'rb') as file:
         base64_info = b64encode(file.read())
         return base64_info.decode()
+
+cpdef str base85_encode_file(str file_path):
+    """
+    we are gonna read the file in rb mode, encode in base85, and return the base85.
+    :param file_path: full path to file to encode in base85.
+    """
+    with open(file_path, 'rb') as file:
+        base85_info = b85encode(file.read())
+        return base85_info.decode()
+
+cpdef str a85_encode_file(str file_path):
+    """
+    we are gonna read the file in rb mode, encode in a85, and return the a85.
+    :param file_path: full path to file to encode in a85.
+    """
+    with open(file_path, 'rb') as file:
+        a85_info = a85encode(file.read())
+        return a85_info.decode()
+
 
 cpdef str get_current_file_path():
     """
