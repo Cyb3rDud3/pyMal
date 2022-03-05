@@ -166,7 +166,7 @@ class Obfuscate:
         os.chdir(self.base_dir)
         tryUninstallExisting = self.utils.run_process(f"{self.python_path} -m pip uninstall pyinstaller --yes")
         tryInstall = self.utils.run_process(f"{self.python_path} setup.py install")
-        if type(tryInstall) == list:
+        if type(tryInstall) == list and b'warning' not in tryInstall[0]:
             logger.error("ERROR INSTALLING PYINSTALLER")
             logger.error(tryInstall)
             sys.exit()
