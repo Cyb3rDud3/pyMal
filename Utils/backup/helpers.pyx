@@ -213,10 +213,10 @@ cpdef str run_detached_process(str code, bint is_powershell=False):
     si = subprocess.STARTUPINFO()
     si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     if is_powershell:
-        p = subprocess.run(code, shell=True, **DETACHED_NEW_WITH_CONSOLE)
+        p = subprocess.run(code,stdin=subprocess.DEVNULL, shell=True, **DETACHED_NEW_WITH_CONSOLE)
         return ""
     else:
-        p = subprocess.Popen(code, stderr=subprocess.PIPE, stdout=subprocess.PIPE, **DETACHED_NEW_WITH_CONSOLE)
+        p = subprocess.Popen(code,stdin=subprocess.DEVNULL, stderr=subprocess.PIPE, stdout=subprocess.PIPE, **DETACHED_NEW_WITH_CONSOLE)
     stdout, stderr = p.communicate()
     return stdout.decode()
 
