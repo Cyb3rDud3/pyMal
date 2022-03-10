@@ -3,3 +3,6 @@ metamorphic malware that should recompile the pyinstaller bootloader with obfusc
 this module is not done and i have a LOT to do, feel free to contribute
 
 PLEASE DO NOT USE FOR ANY MALICIOUS INTENTIONS, THIS PROJECT CREATED FOR RESEARCH ONLY, AND BASED ON THE CONCEPT FOUND BY https://arxiv.org/pdf/2105.00565.pdf
+AS THIS IS POC WITH NO BAD INTENTIONS --> WE ARE NOT GONNA "ENABLE" ANY BAD FUNCTIONALITY HERE! ONLY WRITING IT, NOT CALLING!
+
+קופה ראשית.
