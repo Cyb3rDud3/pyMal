@@ -231,20 +231,41 @@ cpdef bint is_os_64bit():
 cpdef str find_python_path():
     python_reg_key = r"SOFTWARE\Python\PythonCore\3.{}\InstallPath"
     python_reg_value = "ExecutablePath"
+    BASIC_APPDATA_LOCATION = r"c:\Users\{}\appdata\local\Programs\Python\Python3{}\python.exe"
+    possible_locations = ['c:/Program Files', 'c:/Program Files (x86)', 'c:/ProgramData']
     for python_minor_version in range(5,10):
         try:
-            if is_admin():
-                value = getRegistryKey(key_name=python_reg_value,registry_path=python_reg_key.format(python_minor_version),HKLM=True)
-            else:
-                value = getRegistryKey(key_name=python_reg_value,registry_path=python_reg_key.format(python_minor_version),HKLM=False)
-            if value:
-                return value
+            admin_value = getRegistryKey(key_name=python_reg_value,registry_path=python_reg_key.format(python_minor_version),HKLM=True)
+            user_value = getRegistryKey(key_name=python_reg_value,registry_path=python_reg_key.format(python_minor_version),HKLM=False)
+            if user_value:
+                return user_value
+            if admin_value:
+                return admin_value
         except WindowsError:
             continue
+        if os.path.exists(BASIC_APPDATA_LOCATION.format(os.getlogin(),python_minor_version)):
+            return BASIC_APPDATA_LOCATION.format(os.getlogin(),python_minor_version)
+    for location in possible_locations:
+        if os.path.exists(location) and os.path.isdir(location):
+            for directory in os.listdir(location):
+                if 'python' in directory.lower():
+                    if ''.join([char for char in directory.lower() if char.isdigit()]).startswith('3'):
+                        path_to_python = os.path.join(location,directory)
+                        if 'python.exe' in os.listdir(path_to_python):
+                            return os.path.join(path_to_python,'python.exe')
+
+
     from_shell = ''.join([line.strip() for line in run_pwsh("where python").splitlines() if 'WindowsApps' not in line and 'python.exe' in line])
     if from_shell:
         return from_shell
     return ""
+
+cpdef bint is_gcc_in_path():
+    paths = os.environ['path'].split(';')
+    for path in paths:
+        if 'mingw64' in path.lower():
+            return True
+    return False
 
 
 cpdef str base64_encode_file(str file_path):

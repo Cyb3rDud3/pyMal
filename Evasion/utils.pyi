@@ -62,3 +62,9 @@ def get_keyboard_language() -> str:
     Gets the keyboard language in use by the current
     active window process.
     """
+
+def is_inside_rdp() -> bool:
+    """returns bool indicating we are inside rdp session"""
+
+def is_power_user() -> bool:
+    """returns bool indicating if use is power user"""

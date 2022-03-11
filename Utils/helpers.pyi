@@ -44,7 +44,10 @@ def extract_zip(extraction_path : str , file_to_extract : str) -> bool:
 def is_online() -> bool:
     """check if we can access google.com. """
 
-
+def is_gcc_in_path() -> bool:
+    """
+    return bool indicating whether mingw exists.
+    """
 
 def is_python_exist() -> bool:
     """check if python exist."""
