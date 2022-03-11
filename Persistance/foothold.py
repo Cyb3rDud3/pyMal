@@ -199,7 +199,7 @@ while get_idle_duration() < 180:
         check_if_pyinstaller_installed = f"{python_path} -m pip list"
     print(run_pwsh(check_if_pyinstaller_installed))
     if 'pyinstaller' in run_pwsh(check_if_pyinstaller_installed).lower():
-        if 'program' in python_path.lower():
+        if 'program' in python_path.lower() and 'appdata' not in python_path.lower():
             pyinstaller_path = 'pyinstaller.exe'
         else:
             pyinstaller_path = python_path.replace('python.exe', 'scripts/pyinstaller.exe')

@@ -31,10 +31,37 @@ class Obfuscate:
         self.python_path = python_path
         self.utils = Utils()
         self.error_strings = {"LOADER:",
+                              "SPLASH:",
+                              "Cannot allocate memory",
+                              "Cannot find requirement",
+                              "Tcl is not threaded. Only threaded tcl is supported.",
+                              "Cannot extract requirement",
+                              "Could not allocate buffer for",
+                              "Error loading Python DLL",
+                              "Error creating child process!",
+                              "Module object for",
+                              "Could not read full TOC!",
+                              "Error on file.",
+                              "Path of DLL",
+                              "length exceeds",
+                              "Absolute path to script exceeds",
+                              "No error messages generated.",
+                              "Path of ucrtbase.dll",
+                              "Reported length",
                               "to extract",
                               "Failed",
                               "to allocate",
-                              "to convert", "to set"}
+                              "to convert",
+                              "to set",
+                              "to get address for",
+                              "to read data chunk!",
+                              "executable path to",
+                              "progname to",
+                              "to get _MEIPASS as",
+                              "to unmarshal code object for",
+                              "to load tcl/tk libraries",
+                              "to seek to cookie position!",
+                              "to append to"}
 
 
     def tamper_magic(self):
