@@ -64,7 +64,7 @@ cpdef str getRegistryKey(str key_name,str registry_path,bint HKLM = False):
                                        winreg.KEY_READ)
         value, regtype = winreg.QueryValueEx(registry_key, key_name)
         winreg.CloseKey(registry_key)
-        return value
+        return str(value)
     except WindowsError:
         return ""
 

