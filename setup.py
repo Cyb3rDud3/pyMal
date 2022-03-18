@@ -1,6 +1,7 @@
 from setuptools import setup
 from Cython.Build import cythonize
 from shutil import copyfile
+
 setup(
     ext_modules = cythonize("Evasion/backup/debugEvasion.pyx", language_level = "3str")
 
