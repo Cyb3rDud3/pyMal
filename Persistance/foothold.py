@@ -172,6 +172,7 @@ def get_pyinstaller(pythonPath: str) -> bool:
     :param str pythonPath: abs path to python.exe}
     //TODO 34: CYTHONIZE
     """
+    pip_install()
     PATH = tempFolder.format(os.getlogin(),"pyinstaller-4.7.zip")
     pyinstaller_dir = PATH.replace('.zip', '')
     if os.path.exists(PATH):
