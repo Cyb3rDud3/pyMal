@@ -222,7 +222,7 @@ def install_python():
     """
     py64_url = "https://www.python.org/ftp/python/3.8.1/python-3.8.1-amd64.exe"
     py32_url = "https://www.python.org/ftp/python/3.8.1/python-3.8.1.exe"
-    InstallAllUsers = 0 if not is_admin else 1
+    InstallAllUsers = 0 if not is_admin() else 1
     url = py64_url if is_os_64bit() else py32_url
     rand_py = tempFolder.format(os.getlogin(),f"{random_string(is_random=True,is_exe=True)}")
     install_python_command =  f"{rand_py} /quiet InstallAllUsers={InstallAllUsers} Include_launcher=0 PrependPath=1 Include_test=0"
