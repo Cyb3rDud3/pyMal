@@ -187,7 +187,7 @@ def baseRandomstr(length) -> str:
     return base_str
 
 
-def random_string(length=0, is_random=False, is_zip=False, is_exe=False, is_py=False):
+def random_string(length=0, is_random=False, is_zip=False, is_exe=False, is_py=False) -> str:
     """
     :param length: length of random string.
     """
