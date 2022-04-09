@@ -1,6 +1,6 @@
 import threading
 import os
-from .Utils import encrypt,key,encryptor
+from .Utils import encrypt,key
 from Utils.helpers import random_string
 IGNORE_LIST = {'windows', 'python', 'microsoft', 'system'}
 
