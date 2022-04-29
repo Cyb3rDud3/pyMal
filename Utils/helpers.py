@@ -19,7 +19,6 @@ tempFolder = "c:/users/{}/appdata/local/temp/{}"
 BaseTempFolder = "c:/users/{}/appdata/local/temp"
 TypicalRegistryKey = "SOFTWARE\Microsoft"
 
-
 def setRegistryKey(key_name, value, registry_path, HKLM=False):
     """
     :param key_name: registry key name
